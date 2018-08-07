@@ -24,6 +24,8 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+RELIC-INFO
+ci_watson/version.py
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
