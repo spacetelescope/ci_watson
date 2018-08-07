@@ -1,0 +1,16 @@
+include README.md
+include LICENSE.md
+include setup.cfg
+recursive-include docs *
+
+include RELIC-INFO
+exclude ci_watson/version.py
+
+recursive-include relic/ *
+prune relic/.git
+prune relic/tests
+
+prune build
+prune docs/build
+
+global-exclude *.pyc *.o
