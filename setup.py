@@ -2,7 +2,7 @@
 import os
 import pkgutil
 import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 from subprocess import check_call, CalledProcessError
 
 
@@ -51,12 +51,17 @@ setup(
     license=LICENSE,
     url=URL,
     classifiers=CLASSIFIERS,
-    packages=[PACKAGENAME],
-    package_dir={PACKAGENAME: PACKAGENAME},
+    packages=find_packages(exclude=['tests']),
+    include_package_data=True,
     install_requires=[
-        'astropy>=2',
-        'numpy'
+        'pytest>=3'
     ],
+    python_requires='>=3.5',
+    entry_points={
+        'pytest11': [
+            'pytest_ciwatson = ci_watson.plugin',
+        ],
+    },
     use_2to3=False,
     zip_safe=False
 )
