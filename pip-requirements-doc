@@ -1,0 +1,4 @@
+pytest
+numpydoc
+sphinx_rtd_theme
+sphinx-automodapi

@@ -5,6 +5,8 @@ pytest plugin.
 import os
 import pytest
 
+__all__ = []
+
 
 def pytest_addoption(parser):
     """

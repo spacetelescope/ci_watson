@@ -24,6 +24,7 @@ UPLOAD_SCHEMA = {"files": [
 
 
 class BigdataError(Exception):
+    """Exception related to big data access."""
     pass
 
 
