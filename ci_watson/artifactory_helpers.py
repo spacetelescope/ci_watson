@@ -8,7 +8,7 @@ import re
 import shutil
 from collections import Iterable
 
-__all__ = ['BigdataError', 'get_bigdata', 'upload_results']
+__all__ = ['BigdataError', 'get_bigdata', 'generate_upload_schema']
 
 RE_URL = re.compile('\w+://\S+')
 
@@ -117,7 +117,7 @@ def get_bigdata(*args):
     return dest
 
 
-def upload_results(pattern, target, testname, recursive=False):
+def generate_upload_schema(pattern, target, testname, recursive=False):
     """
     Write out JSON file to upload Jenkins results from test to
     Artifactory storage area.
