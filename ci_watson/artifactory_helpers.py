@@ -8,7 +8,8 @@ import re
 import shutil
 from collections import Iterable
 
-__all__ = ['BigdataError', 'get_bigdata', 'generate_upload_schema']
+__all__ = ['BigdataError', 'get_bigdata_root', 'get_bigdata',
+           'generate_upload_schema']
 
 RE_URL = re.compile('\w+://\S+')
 
@@ -56,7 +57,7 @@ def _download(url, dest):
     return dest
 
 
-def _select_bigdata(envkey='TEST_BIGDATA'):
+def get_bigdata_root(envkey='TEST_BIGDATA'):
     """
     Find and returns the path to the nearest big datasets.
     """
@@ -98,7 +99,7 @@ def get_bigdata(*args):
     /path/to/example.fits
 
     """
-    src = os.path.join(_select_bigdata(), *args)
+    src = os.path.join(get_bigdata_root(), *args)
     filename = os.path.basename(src)
     dest = os.path.abspath(os.path.join(os.curdir, filename))
 

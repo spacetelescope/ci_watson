@@ -1,6 +1,8 @@
 """Helper module for HST tests."""
 
-__all__ = ['ref_from_image', 'raw_from_asn']
+import os
+
+__all__ = ['ref_from_image', 'raw_from_asn', 'download_crds']
 
 
 def _get_reffile(hdr, key):
@@ -80,3 +82,47 @@ def raw_from_asn(asn_file, suffix='_raw.fits'):
         raw_files.append(pfx + suffix)
 
     return raw_files
+
+
+def download_crds(refdir, refname, timeout=30, verbose=False):
+    """
+    Download a CRDS file from HTTP to current directory.
+
+    Parameters
+    ----------
+    refdir : str
+        Instrument-specific sub-directory. Example: 'jref'
+
+    refname : str
+        Filename. Example: '012345678_bia.fits'
+
+    timeout : int or `None`
+        Number of seconds before timeout error is raised.
+        If `None`, no timeout happens but this is not recommended.
+
+    verbose : bool
+        If `True`, print messages to screen.
+        This is useful for debugging.
+
+    """
+    # CRDS file for given name never changes, so no need to re-download.
+    if os.path.exists(refname):
+        if verbose:
+            print('{} already exists, skipping download'.format(refname))
+        return
+
+    # If direct access to Central Storage is possible, no need to download.
+    if refdir in os.environ:
+        fname = os.path.join(os.environ[refdir], refname)
+        if os.path.isfile(fname):
+            if verbose:
+                print('{} accessible, skipping download'.format(fname))
+            return
+
+    from ci_watson.artifactory_helpers import _download
+
+    url = 'http://ssb.stsci.edu/cdbs/{}/{}'.format(refdir, refname)
+    _download(url, refname, timeout=timeout)
+
+    if verbose:
+        print('Downloaded {} from {}'.format(refname, url))
