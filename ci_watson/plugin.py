@@ -52,7 +52,7 @@ def pytest_runtest_setup(item):
         pytest.skip("need --bigdata option to run")
 
 
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope='function')
 def _jail(tmpdir):
     """Perform test in a pristine temporary working directory."""
     os.chdir(tmpdir.strpath)
