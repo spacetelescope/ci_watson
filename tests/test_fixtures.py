@@ -19,5 +19,6 @@ class TestDirectoryInit:
         with open("myfile", "w") as f:
             f.write("hello")
 
-    def test_cwd_again_starts_empty(self):
+    @pytest.mark.parametrize('x', [1, 2])
+    def test_cwd_again_starts_empty(self, x):
         assert os.listdir(os.getcwd()) == []
