@@ -121,6 +121,8 @@ def download_crds(refdir, refname, timeout=30, verbose=False):
 
     from ci_watson.artifactory_helpers import _download
 
+    # NOTE: For this part to work, jref (for example) must point to
+    #       "." or reference file value in FITS header cannot have "jref$".
     url = 'http://ssb.stsci.edu/cdbs/{}/{}'.format(refdir, refname)
     _download(url, refname, timeout=timeout)
 
