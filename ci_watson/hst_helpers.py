@@ -37,8 +37,6 @@ def ref_from_image(input_image, reffile_lookup):
         input file.
 
     """
-    # NOTE: Add additional mapping as needed.
-    # Map mandatory CRDS reference file for instrument/detector combo.
     from astropy.io import fits
 
     ref_files = []
@@ -84,17 +82,21 @@ def raw_from_asn(asn_file, suffix='_raw.fits'):
     return raw_files
 
 
-def download_crds(refdir, refname, timeout=30, verbose=False):
+def download_crds(refname, timeout=30, verbose=False):
     """
     Download a CRDS file from HTTP to current directory.
 
     Parameters
     ----------
-    refdir : str
-        Instrument-specific sub-directory. Example: 'jref'
-
     refname : str
-        Filename. Example: '012345678_bia.fits'
+        Filename. Examples::
+
+            '012345678_bia.fits'
+            'jref$012345678_bia.fits'
+            '/path/to/012345678_bia.fits'
+
+        But only filename with ``dir$name`` format would
+        proceed to download stage.
 
     timeout : int or `None`
         Number of seconds before timeout error is raised.
@@ -105,26 +107,36 @@ def download_crds(refdir, refname, timeout=30, verbose=False):
         This is useful for debugging.
 
     """
-    # CRDS file for given name never changes, so no need to re-download.
-    if os.path.exists(refname):
+    refdir = None
+
+    # Expand IRAF-style dir shortcut.
+    if '$' in refname:
+        refdir, fname = refname.split('$')
+        if refdir in os.environ:
+            refname = os.path.join(os.environ[refdir], fname)
+        else:
+            refname = fname
+
+    # CRDS file for given name never changes, so no need to re-download
+    # if already copied over prior or directly accessible on disk somewhere.
+    if os.path.isfile(refname):
         if verbose:
             print('{} already exists, skipping download'.format(refname))
         return
 
-    # If direct access to Central Storage is possible, no need to download.
-    if refdir in os.environ:
-        fname = os.path.join(os.environ[refdir], refname)
-        if os.path.isfile(fname):
-            if verbose:
-                print('{} accessible, skipping download'.format(fname))
-            return
+    # Do not know where to download.
+    if refdir is None:
+        raise ValueError('Unknown HTTP destination for {}'.format(refname))
 
-    from ci_watson.artifactory_helpers import _download
+    from ci_watson.artifactory_helpers import _is_url, _download
 
     # NOTE: For this part to work, jref (for example) must point to
     #       "." or reference file value in FITS header cannot have "jref$".
-    url = 'http://ssb.stsci.edu/cdbs/{}/{}'.format(refdir, refname)
-    _download(url, refname, timeout=timeout)
+    url = 'http://ssb.stsci.edu/cdbs/{}/{}'.format(refdir, fname)
+    if _is_url(url):
+        _download(url, fname, timeout=timeout)
+    else:
+        raise ValueError('Invalid URL {}'.format(url))
 
     if verbose:
         print('Downloaded {} from {}'.format(refname, url))
