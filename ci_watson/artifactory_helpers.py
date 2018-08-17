@@ -65,7 +65,13 @@ def get_bigdata_root(envkey='TEST_BIGDATA'):
         raise BigdataError(
             'Environment variable {} is undefined'.format(envkey))
 
-    for path in os.environ[envkey]:
+    val = os.environ[envkey]
+    if isinstance(val, str):
+        paths = [val]
+    else:
+        paths = val
+
+    for path in paths:
         if os.path.exists(path) or _is_url(path):
             return path
 
