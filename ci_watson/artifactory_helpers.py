@@ -43,13 +43,13 @@ def _is_url(url):
     return True
 
 
-def _download(url, dest):
+def _download(url, dest, timeout=30):
     """Simple HTTP/HTTPS downloader."""
     import requests
 
     dest = os.path.abspath(dest)
 
-    with requests.get(url, stream=True) as r:
+    with requests.get(url, stream=True, timeout=timeout) as r:
         with open(dest, 'w+b') as data:
             for chunk in r.iter_content(chunk_size=0x4000):
                 data.write(chunk)
