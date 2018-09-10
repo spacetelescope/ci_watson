@@ -26,13 +26,29 @@ The plugin portion of ``ci_watson`` contains:
   is up to the author of the test.
 * ``--bigdata`` option and ``@pytest.mark.bigdata`` decorator to run or skip
   tests that require intranet (Artifactory, Central Storage, etc) access.
-  Additional setup is required for these tests to run successfully.
+  Additional setup is required for these tests to run successfully
+  (see :ref:`bigdata_setup`).
   It is up to the author of the test to perform such setup properly.
 * ``--env`` option and ``envopt`` fixture to set the test environment to
   ``"dev"`` or ``"stable"``. This plugin only sets the value. It is up to
   the author of the test to use this environment setting properly.
 * ``_jail`` fixture to enable a test to run in a pristine temporary working
   directory. This is particularly useful for pipeline tests.
+
+
+.. _bigdata_setup:
+
+Setting Up For Big Data
+=======================
+
+The ``--bigdata`` option is used together with the environment variable,
+``TEST_BIGDATA``, as used by
+:func:`~ci_watson.artifactory_helpers.get_bigdata_root`. For local testing,
+set this variable to where you downloaded your Artifactory data.
+For remote testing (e.g., with Jenkins CI), set it to your Artifactory path
+in ``Jenkinsfile`` or ``JenkinsfileRT``, as appropriate. For more details,
+please refer to STScI Innerspace document for
+"Users Guide: Running Regression Tests".
 
 
 Reference/API
