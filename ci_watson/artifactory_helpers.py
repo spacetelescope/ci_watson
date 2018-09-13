@@ -36,7 +36,8 @@ def _is_url(url):
 
     import requests
 
-    r = requests.head(url, allow_redirects=True)
+    # requests.head does not work with Artifactory landing page.
+    r = requests.get(url, allow_redirects=True)
     # TODO: Can we simply return r.ok here?
     if r.status_code >= 400:
         return False
