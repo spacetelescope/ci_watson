@@ -24,7 +24,7 @@ def require_crds_context(required_context):
     import crds
 
     current_context_string = crds.get_context_name('jwst')
-    match = re.match('jwst_(\d\d\d\d)\.pmap', current_context_string)
+    match = re.match(r"jwst_(\d\d\d\d)\.pmap", current_context_string)
     current_context = int(match.group(1))
 
     return pytest.mark.skipif(

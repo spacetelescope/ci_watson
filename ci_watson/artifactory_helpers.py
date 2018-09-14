@@ -11,7 +11,7 @@ from collections import Iterable
 __all__ = ['BigdataError', 'get_bigdata_root', 'get_bigdata',
            'generate_upload_schema']
 
-RE_URL = re.compile('\w+://\S+')
+RE_URL = re.compile(r"\w+://\S+")
 
 UPLOAD_SCHEMA = {"files": [
                     {"pattern": "",
