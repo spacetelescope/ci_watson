@@ -58,7 +58,7 @@ def _download(url, dest, timeout=30):
     return dest
 
 
-def get_bigdata_root(envkey='TEST_BIGDATA'):
+def get_bigdata_root(repo='', envkey='TEST_BIGDATA'):
     """
     Find and returns the path to the nearest big datasets.
     """
@@ -68,6 +68,8 @@ def get_bigdata_root(envkey='TEST_BIGDATA'):
 
     val = os.environ[envkey]
     if isinstance(val, str):
+        if _is_url(val):
+            val = os.path.join(val, repo)
         paths = [val]
     else:
         paths = val
@@ -79,7 +81,7 @@ def get_bigdata_root(envkey='TEST_BIGDATA'):
     return None
 
 
-def get_bigdata(*args):
+def get_bigdata(*args, repo='', copy_local=True):
     """
     Acquire requested data from a managed resource
     to the current directory.
@@ -88,6 +90,16 @@ def get_bigdata(*args):
     ----------
     args : tuple of str
         Location of file relative to ``TEST_BIGDATA``.
+
+    repo : str
+        Name of repository on Artifactory where data is located.  This will be
+        appended to whatever was specified in ``TEST_BIGDATA`` to complete
+        the URL for finding the data for the test, if ``TEST_BIGDATA`` was
+        specified as a URL in the first place. Default: ''
+
+    copy_local : bool
+        Switch to control whether or not to copy a file found on local directory
+        into the test output directory when running the test.  Default: True
 
     Returns
     -------
@@ -106,17 +118,22 @@ def get_bigdata(*args):
     /path/to/example.fits
 
     """
-    src = os.path.join(get_bigdata_root(), *args)
+    src = os.path.join(get_bigdata_root(repo=repo), *args)
     filename = os.path.basename(src)
     dest = os.path.abspath(os.path.join(os.curdir, filename))
+    is_url = _is_url(src)
 
-    if os.path.exists(src):
+    if os.path.exists(src) and not is_url:
+        # Found src file on locally accessible directory
         if src == dest:
             raise BigdataError('Source and destination paths are identical: '
                                '{}'.format(src))
-        shutil.copy2(src, dest)
+        if copy_local:
+            shutil.copy2(src, dest)
+        else:
+            dest = os.path.abspath(src)
 
-    elif _is_url(src):
+    elif is_url:
         _download(src, dest)
 
     else:
