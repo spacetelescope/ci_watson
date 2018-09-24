@@ -67,9 +67,11 @@ def get_bigdata_root(repo='', envkey='TEST_BIGDATA'):
             'Environment variable {} is undefined'.format(envkey))
 
     val = os.environ[envkey]
-    if isinstance(val, str):
-        if _is_url(val):
+
+    if RE_URL.match(val) is not None:
             val = os.path.join(val, repo)
+
+    if isinstance(val, str):
         paths = [val]
     else:
         paths = val
