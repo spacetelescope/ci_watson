@@ -102,12 +102,6 @@ def get_bigdata(*args, docopy=True):
     args : tuple of str
         Location of file relative to ``TEST_BIGDATA``.
 
-    repo : str
-        Name of repository on Artifactory where data is located.  This will be
-        appended to whatever was specified in ``TEST_BIGDATA`` to complete
-        the URL for finding the data for the test, if ``TEST_BIGDATA`` was
-        specified as a URL in the first place. Default: ''
-
     docopy : bool
         Switch to control whether or not to copy a file found on local directory
         into the test output directory when running the test.  Default: True
