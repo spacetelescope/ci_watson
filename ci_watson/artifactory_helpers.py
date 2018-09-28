@@ -414,11 +414,11 @@ def compare_outputs(outputs, raise_error=True, **kwargs):
                         dt, testdir) + os.sep
 
         # Write out JSON file to enable retention of different results
-        new_truths = [os.path.abspath(i[1]) for i in updated_outputs]
-        for files in updated_outputs:
+        new_truths = [os.path.basename(i[1]) for i in updated_outputs]
+        for files, new_truth in zip(updated_outputs, new_truths):
             print("Renaming {} as new 'truth' file: {}".format(
-                  files[0], files[1]))
-            shutil.move(files[0], files[1])
+                  files[0], new_truth))
+            shutil.move(files[0], new_truth)
         log_pattern = [os.path.join(os.path.dirname(x), '*.log') for x in new_truths]
         generate_upload_schema(pattern=new_truths + log_pattern,
                        testname=testname,
