@@ -38,7 +38,7 @@ class BigdataError(Exception):
     pass
 
 
-def _is_url(url):
+def check_url(url):
     """Determine if URL can be resolved without error."""
     if RE_URL.match(url) is None:
         return False
@@ -67,7 +67,7 @@ def _download(url, dest, timeout=30):
     return dest
 
 
-def get_bigdata_root(repo='', envkey='TEST_BIGDATA'):
+def get_bigdata_root(envkey='TEST_BIGDATA'):
     """
     Find and returns the path to the nearest big datasets.
     """
@@ -78,7 +78,7 @@ def get_bigdata_root(repo='', envkey='TEST_BIGDATA'):
     val = os.environ[envkey]
 
 #    if RE_URL.match(val) is not None:
-    val = os.path.join(val, repo)
+#    val = os.path.join(val, repo)
 
     if isinstance(val, str):
         paths = [val]
@@ -86,13 +86,13 @@ def get_bigdata_root(repo='', envkey='TEST_BIGDATA'):
         paths = val
 
     for path in paths:
-        if os.path.exists(path) or _is_url(path):
+        if os.path.exists(path) or check_url(path):
             return path
 
     return None
 
 
-def get_bigdata(*args, repo='', docopy=True):
+def get_bigdata(*args, docopy=True):
     """
     Acquire requested data from a managed resource
     to the current directory.
@@ -129,10 +129,10 @@ def get_bigdata(*args, repo='', docopy=True):
     /path/to/example.fits
 
     """
-    src = os.path.join(get_bigdata_root(repo=repo), *args)
+    src = os.path.join(get_bigdata_root(), *args)
     filename = os.path.basename(src)
     dest = os.path.abspath(os.path.join(os.curdir, filename))
-    is_url = _is_url(src)
+    is_url = check_url(src)
 
     if not docopy:
         return os.path.abspath(src)
@@ -197,11 +197,19 @@ def compare_outputs(outputs, raise_error=True, **kwargs):
           - rtol : float
           - atol : float
           - results_root : string
-          - input_loc : string
-          - ref_loc : list
-          - tree : string
-          - input_repo : string
+          - input_path : list
 
+        where `input_path` would be the list of directory names in the full 
+        full path to the data.  For example, with `get_bigdata_root` pointing
+        to '`\grp\test_data`, a file at ::
+        
+            `\grp\test_data\pipeline\dev\ins\test_1\test_a.py`
+
+        would require `input_path` of ::
+        
+             `["pipeline","dev","ins","test_1"]`
+             
+             
     Returns
     -------
     report : str
@@ -304,11 +312,8 @@ def compare_outputs(outputs, raise_error=True, **kwargs):
     ignore_fields = kwargs.get('ignore_fields', [])
     rtol = kwargs.get('rtol', None)
     atol = kwargs.get('atol', None)
-    ref_loc = kwargs.get('ref_loc', [])
-    input_loc = kwargs.get('input_loc', '')
+    input_path = kwargs.get('input_path', [])
     results_root = kwargs.get('results_root', None)
-    input_repo = kwargs.get('input_repo', None)
-    tree = kwargs.get('tree', None)
     docopy = kwargs.get('docopy', True)
 
     updated_outputs = []
@@ -344,8 +349,8 @@ def compare_outputs(outputs, raise_error=True, **kwargs):
             desired_extn = None
 
         # Get "truth" image
-        s = get_bigdata(tree, input_loc, *ref_loc, desired_name,
-                        repo=input_repo, docopy=docopy)
+        s = get_bigdata(*input_path, desired_name,
+                        docopy=docopy)
         if s is not None:
             desired = s
             if desired_extn is not None:
