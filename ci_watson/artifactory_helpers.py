@@ -67,7 +67,7 @@ def _download(url, dest, timeout=30):
     return dest
 
 
-def get_bigdata_root(envkey='TEST_BIGDATA'):
+def get_bigdata_root(repo='', envkey='TEST_BIGDATA'):
     """
     Find and returns the path to the nearest big datasets.
     """
@@ -78,13 +78,13 @@ def get_bigdata_root(envkey='TEST_BIGDATA'):
     val = os.environ[envkey]
 
 #    if RE_URL.match(val) is not None:
-#    val = os.path.join(val, repo)
+    val = os.path.join(val, repo)
 
     if isinstance(val, str):
         paths = [val]
     else:
         paths = val
-
+    print("[ci_watson.get_bigdata_root] paths: {}".format(paths))
     for path in paths:
         if os.path.exists(path) or check_url(path):
             return path
@@ -92,7 +92,7 @@ def get_bigdata_root(envkey='TEST_BIGDATA'):
     return None
 
 
-def get_bigdata(*args, docopy=True):
+def get_bigdata(*args, repo='', docopy=True):
     """
     Acquire requested data from a managed resource
     to the current directory.
@@ -101,6 +101,12 @@ def get_bigdata(*args, docopy=True):
     ----------
     args : tuple of str
         Location of file relative to ``TEST_BIGDATA``.
+        
+    repo : str
+       Name of repository on Artifactory where data is located.  This will be
+       appended to whatever was specified in ``TEST_BIGDATA`` to complete
+       the URL for finding the data for the test, if ``TEST_BIGDATA`` was
+       specified as a URL in the first place. Default: ''
 
     docopy : bool
         Switch to control whether or not to copy a file found on local directory
@@ -123,7 +129,8 @@ def get_bigdata(*args, docopy=True):
     /path/to/example.fits
 
     """
-    src = os.path.join(get_bigdata_root(), *args)
+    print("[ci-watson.get_bigdata] repo={}".format(repo))
+    src = os.path.join(get_bigdata_root(repo=repo), *args)
     filename = os.path.basename(src)
     dest = os.path.abspath(os.path.join(os.curdir, filename))
     is_url = check_url(src)
@@ -192,6 +199,7 @@ def compare_outputs(outputs, raise_error=True, **kwargs):
           - atol : float
           - results_root : string
           - input_path : list
+          - input_repo : str
 
         where `input_path` would be the list of directory names in the full 
         full path to the data.  For example, with `get_bigdata_root` pointing
@@ -309,6 +317,7 @@ def compare_outputs(outputs, raise_error=True, **kwargs):
     input_path = kwargs.get('input_path', [])
     results_root = kwargs.get('results_root', None)
     docopy = kwargs.get('docopy', True)
+    input_repo = kwargs.get('input_repo', '')
 
     updated_outputs = []
     extn_list = None
@@ -344,6 +353,7 @@ def compare_outputs(outputs, raise_error=True, **kwargs):
 
         # Get "truth" image
         s = get_bigdata(*input_path, desired_name,
+                        repo=input_repo,
                         docopy=docopy)
         if s is not None:
             desired = s
