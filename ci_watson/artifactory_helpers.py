@@ -84,7 +84,7 @@ def get_bigdata_root(repo='', envkey='TEST_BIGDATA'):
         paths = [val]
     else:
         paths = val
-    print("[ci_watson.get_bigdata_root] paths: {}".format(paths))
+
     for path in paths:
         if os.path.exists(path) or check_url(path):
             return path
@@ -129,7 +129,6 @@ def get_bigdata(*args, repo='', docopy=True):
     /path/to/example.fits
 
     """
-    print("[ci-watson.get_bigdata] repo={}".format(repo))
     src = os.path.join(get_bigdata_root(repo=repo), *args)
     filename = os.path.basename(src)
     dest = os.path.abspath(os.path.join(os.curdir, filename))
@@ -200,6 +199,7 @@ def compare_outputs(outputs, raise_error=True, **kwargs):
           - results_root : string
           - input_path : list
           - input_repo : str
+          - input_loc : str
 
         where `input_path` would be the list of directory names in the full 
         full path to the data.  For example, with `get_bigdata_root` pointing
@@ -318,6 +318,7 @@ def compare_outputs(outputs, raise_error=True, **kwargs):
     results_root = kwargs.get('results_root', None)
     docopy = kwargs.get('docopy', True)
     input_repo = kwargs.get('input_repo', '')
+    input_loc = kwargs.get('input_loc','')
 
     updated_outputs = []
     extn_list = None
