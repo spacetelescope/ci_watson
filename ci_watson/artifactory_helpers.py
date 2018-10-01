@@ -193,17 +193,17 @@ def compare_outputs(outputs, raise_error=True, **kwargs):
           - results_root : string
           - input_path : list
 
-        where `input_path` would be the list of directory names in the full 
+        where `input_path` would be the list of directory names in the full
         full path to the data.  For example, with `get_bigdata_root` pointing
         to '`\grp\test_data`, a file at ::
-        
+
             `\grp\test_data\pipeline\dev\ins\test_1\test_a.py`
 
         would require `input_path` of ::
-        
+
              `["pipeline","dev","ins","test_1"]`
-             
-             
+
+
     Returns
     -------
     report : str
@@ -300,19 +300,19 @@ def compare_outputs(outputs, raise_error=True, **kwargs):
     build_suffix = os.environ.get('BUILD_MATRIX_SUFFIX', 'standalone')
     testdir = "{}_{}_{}".format(testname, build_tag, build_suffix)
 
-    # Parse any user-specified kwargs
-    ignore_keywords = kwargs.get('ignore_keywords', [])
-    ignore_hdus = kwargs.get('ignore_hdus', [])
-    ignore_fields = kwargs.get('ignore_fields', [])
-    rtol = kwargs.get('rtol', None)
-    atol = kwargs.get('atol', None)
-    input_path = kwargs.get('input_path', [])
-    results_root = kwargs.get('results_root', None)
-    docopy = kwargs.get('docopy', True)
-
     updated_outputs = []
     extn_list = None
     for entry in outputs:
+        # Parse any user-specified kwargs
+        ignore_keywords = kwargs.get('ignore_keywords', [])
+        ignore_hdus = kwargs.get('ignore_hdus', [])
+        ignore_fields = kwargs.get('ignore_fields', [])
+        rtol = kwargs.get('rtol', None)
+        atol = kwargs.get('atol', None)
+        input_path = kwargs.get('input_path', [])
+        results_root = kwargs.get('results_root', None)
+        docopy = kwargs.get('docopy', True)
+
         num_entries = len(entry)
         if isinstance(entry, dict):
             actual = entry['files'][0]
