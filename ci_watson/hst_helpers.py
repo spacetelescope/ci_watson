@@ -2,6 +2,8 @@
 
 import os
 
+from .base_classes import BaseTest
+
 __all__ = ['ref_from_image', 'raw_from_asn', 'download_crds']
 
 
@@ -140,3 +142,57 @@ def download_crds(refname, timeout=30, verbose=False):
 
     if verbose:
         print('Downloaded {} from {}'.format(refname, url))
+
+
+# Base definitions for HST tests
+class BaseHSTCal(BaseTest):
+    refstr = ''
+    prevref = ''
+
+    def __init__(self):
+        super()
+
+    def get_input_file(self, *args, refsep='$'):
+        """
+        Download or copy input file (e.g., RAW) into the working directory.
+        The associated CRDS reference files in ``refstr`` are also
+        downloaded, if necessary.
+        """
+        filename = self.get_data(*args)
+        ref_files = ref_from_image(filename)
+        # print("Looking for REF_FILES: {}".format(ref_files))
+
+        for ref_file in ref_files:
+            if ref_file.strip() == '':
+                continue
+            if refsep not in ref_file:  # Local file
+                refname = self.get_data('customRef', ref_file)
+            else:  # Download from FTP, if applicable
+                s = ref_file.split(refsep)
+                refdir = s[0]
+                refname = s[1]
+                if self.use_ftp_crds:
+                    download_crds(refdir, refname, timeout=self.timeout)
+        return filename
+
+    def set_environ(self, tmpdir):
+        # Specify use of Astrometry updates: default = OFF
+        os.environ['ASTROMETRY_STEP_CONTROL'] = 'OFF'
+
+        if not tmpdir.ensure(self.subdir, dir=True):
+            p = tmpdir.mkdir(self.subdir).strpath
+        else:
+            p = tmpdir.join(self.subdir).strpath
+        os.chdir(p)
+
+        # NOTE: This could be explicitly controlled using pytest fixture
+        #       but too many ways to do the same thing would be confusing.
+        #       Refine this logic if using pytest fixture.
+        # HSTCAL cannot open remote CRDS on FTP but central storage is okay.
+        # So use central storage if available to avoid FTP.
+        if self.prevref is None or self.prevref.startswith(('ftp', 'http')):
+            os.environ[self.refstr] = p + os.sep
+            self.use_ftp_crds = True
+
+    def raw_from_asn(self, asn_file, suffix='_raw.fits'):
+            return raw_from_asn(asn_file, suffix=suffix)
