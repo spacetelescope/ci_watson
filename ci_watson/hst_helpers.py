@@ -128,12 +128,12 @@ def download_crds(refname, timeout=30, verbose=False):
     if refdir is None:
         raise ValueError('Unknown HTTP destination for {}'.format(refname))
 
-    from ci_watson.artifactory_helpers import _is_url, _download
+    from ci_watson.artifactory_helpers import check_url, _download
 
     # NOTE: For this part to work, jref (for example) must point to
     #       "." or reference file value in FITS header cannot have "jref$".
     url = 'http://ssb.stsci.edu/cdbs/{}/{}'.format(refdir, fname)
-    if _is_url(url):
+    if check_url(url):
         _download(url, fname, timeout=timeout)
     else:
         raise ValueError('Invalid URL {}'.format(url))

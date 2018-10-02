@@ -138,10 +138,11 @@ def get_bigdata(*args, docopy=True):
     """
     src = os.path.join(get_bigdata_root(), *args)
     src_exists = os.path.exists(src)
+    src_is_url = check_url(src)
 
     # No-op
     if not docopy:
-        if src_exists:
+        if src_exists or src_is_url:
             return os.path.abspath(src)
         else:
             raise BigdataError('Failed to find data: {}'.format(src))
@@ -156,7 +157,7 @@ def get_bigdata(*args, docopy=True):
                                '{}'.format(src))
         shutil.copy2(src, dest)
 
-    elif check_url(src):
+    elif src_is_url:
         _download(src, dest)
 
     else:
@@ -219,9 +220,9 @@ def compare_outputs(outputs, raise_error=True, ignore_keywords=[],
         that leads to the path of the 'truth' files to be compared
         against. If not provided, it assumes that 'truth' is in the
         working directory. For example, with :func:`get_bigdata_root`
-        pointing to ``\grp\test_data``, a file at::
+        pointing to ``/grp/test_data``, a file at::
 
-            \grp\test_data\pipeline\dev\ins\test_1\test_a.py
+            /grp/test_data/pipeline/dev/ins/test_1/test_a.py
 
         would require ``input_path`` of::
 
@@ -314,18 +315,24 @@ def compare_outputs(outputs, raise_error=True, ignore_keywords=[],
               separately.
 
     """
-    if len(ignore_hdus) > 0 and ASTROPY_LT_3_1:  # pragma: no cover
-        raise ValueError('ignore_hdus cannot be used for astropy<3.1')
+    if ASTROPY_LT_3_1:
+        if len(ignore_hdus) > 0:  # pragma: no cover
+            raise ValueError('ignore_hdus cannot be used for astropy<3.1')
+        default_kwargs = {'rtol': rtol, 'atol': atol,
+                          'ignore_keywords': ignore_keywords,
+                          'ignore_fields': ignore_fields}
+    else:
+        default_kwargs = {'rtol': rtol, 'atol': atol,
+                          'ignore_keywords': ignore_keywords,
+                          'ignore_fields': ignore_fields,
+                          'ignore_hdus': ignore_hdus}
 
     all_okay = True
     creature_report = ''
     updated_outputs = []  # To track outputs for Artifactory JSON schema
 
     for entry in outputs:
-        diff_kwargs = {'rtol': rtol, 'atol': atol,
-                       'ignore_keywords': ignore_keywords,
-                       'ignore_fields': ignore_fields,
-                       'ignore_hdus': ignore_hdus}
+        diff_kwargs = copy.deepcopy(default_kwargs)
         extn_list = None
         num_entries = len(entry)
 
@@ -411,7 +418,8 @@ def compare_outputs(outputs, raise_error=True, ignore_keywords=[],
                 updated_outputs.append((actual, desired))
 
         elif actual_extn is not None or desired_extn is not None:
-            diff_kwargs.pop('ignore_hdus')  # Not applicable
+            if 'ignore_hdus' in diff_kwargs:  # pragma: no cover
+                diff_kwargs.pop('ignore_hdus')  # Not applicable
 
             # Specific element of FITS file specified
             with fits.open(actual_name) as f_act:

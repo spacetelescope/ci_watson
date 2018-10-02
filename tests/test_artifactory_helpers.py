@@ -9,7 +9,7 @@ import os
 import pytest
 
 from ci_watson.artifactory_helpers import (
-    HAS_ASTROPY, ASTROPY_LT_3_1, BigdataError, get_bigdata_root, get_bigdata,
+    HAS_ASTROPY, BigdataError, get_bigdata_root, get_bigdata,
     check_url, compare_outputs, generate_upload_params, generate_upload_schema)
 
 
@@ -81,8 +81,7 @@ class TestGetBigdata:
 
 @pytest.mark.bigdata
 @pytest.mark.usefixtures('_jail')
-@pytest.mark.skipif(not HAS_ASTROPY or ASTROPY_LT_3_1,
-                    reason='requires astropy>=3.1 to run')
+@pytest.mark.skipif(not HAS_ASTROPY, reason='requires astropy to run')
 class TestCompareOutputs:
     """
     Test a few common comparison scenarios.
@@ -97,13 +96,18 @@ class TestCompareOutputs:
     def setup_class(self):
         self.inpath = ('ci-watson', 'dev', 'input')
 
+        if os.environ.get('TEST_BIGDATA').startswith('http'):
+            self.copy = True
+        else:
+            self.copy = False
+
     def test_raise_error_fits(self):
         """Test mismatched extensions from the same file."""
         get_bigdata(*self.inpath, 'j6lq01010_asn.fits', docopy=True)
         outputs = [('j6lq01010_asn.fits[PRIMARY]', 'j6lq01010_asn.fits[asn]')]
         with pytest.raises(AssertionError) as exc:
             compare_outputs(outputs, input_path=self.inpath,
-                            docopy=False, verbose=False)
+                            docopy=self.copy, verbose=False)
             assert 'Headers contain differences' in str(exc)
 
     def test_difference_ascii(self):
@@ -114,7 +118,7 @@ class TestCompareOutputs:
         get_bigdata(*self.inpath, 'j6lq01010_asn_mod.txt', docopy=True)
         report = compare_outputs(
             [('j6lq01010_asn_mod.txt', 'j6lq01010_asn.txt')],
-            input_path=self.inpath, docopy=False, verbose=False,
+            input_path=self.inpath, docopy=self.copy, verbose=False,
             raise_error=False)
         s = report.split(os.linesep)
         assert s[2:] == ['@@ -1,4 +1,4 @@',
@@ -133,7 +137,7 @@ class TestCompareOutputs:
         get_bigdata(*self.inpath, filename, docopy=True)
         report = compare_outputs(
             [(filename, filename)], input_path=self.inpath,
-            docopy=False, verbose=False)
+            docopy=self.copy, verbose=False)
         assert 'No differences found' in report
 
     @pytest.mark.parametrize('docopy', [False, True])
@@ -153,7 +157,7 @@ class TestCompareOutputs:
         """Too many ways to do the same thing."""
         get_bigdata(*self.inpath, 'j6lq01010_asn.fits', docopy=True)
         with pytest.raises(AssertionError) as exc:
-            compare_outputs(outputs, input_path=self.inpath, docopy=False,
+            compare_outputs(outputs, input_path=self.inpath, docopy=self.copy,
                             verbose=False)
             assert 'Ambiguous extension requirements' in str(exc)
 
@@ -178,8 +182,9 @@ class TestCompareOutputs:
                    ('j6lq01010_asn.fits', 'j6lq01010_asn_mod.fits',
                     ['primary', 'IMAGE']),
                    ('j6lq01010_asn.txt', 'j6lq01010_asn.txt')]
-        report = compare_outputs(outputs, input_path=self.inpath, docopy=False,
-                                 verbose=False, raise_error=False)
+        report = compare_outputs(
+            outputs, input_path=self.inpath, docopy=self.copy,
+            verbose=False, raise_error=False)
         s = report.split(os.linesep)
 
         # TODO: Use regex?
