@@ -337,7 +337,11 @@ def compare_outputs(outputs, raise_error=True, ignore_keywords=[],
         num_entries = len(entry)
 
         if isinstance(entry, dict):
-            actual, desired = entry['files']
+            entry_files = entry['files']
+            actual = entry_files[0]
+            desired = entry_files[1]
+            if len(entry_files) > 2:
+                extn_list = entry_files[2]
             diff_kwargs.update(entry.get('pars', {}))
         elif num_entries == 2:
             actual, desired = entry
