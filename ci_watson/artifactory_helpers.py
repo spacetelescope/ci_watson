@@ -303,7 +303,11 @@ def compare_outputs(outputs, raise_error=True, ignore_keywords=[],
             ),
             {'files': ('jw99999_nircam_f140m-maskbar_i2d.fits',
                        'jw99999_nircam_f140m-maskbar_i2d_ref.fits'),
-             'pars': {'ignore_hdus': ['HDRTAB']}
+             'pars': {'ignore_hdus': ['HDRTAB']},
+            {'files': ('jw99999_nircam_f140m-maskbar_i2d.fits',
+                       'jw99999_nircam_f140m-maskbar_i2d_ref.fits',
+                       ['primary','sci','dq']),
+             'pars': {'rtol': 0.000001}
             },
             {'files': ('jw99999_nircam_f140m-maskbar_i2d.fits[hdrtab]',
                        'jw99999_nircam_f140m-maskbar_i2d_ref.fits[hdrtab]'),
@@ -337,7 +341,11 @@ def compare_outputs(outputs, raise_error=True, ignore_keywords=[],
         num_entries = len(entry)
 
         if isinstance(entry, dict):
-            actual, desired = entry['files']
+            entry_files = entry['files']
+            actual = entry_files[0]
+            desired = entry_files[1]
+            if len(entry_files) > 2:
+                extn_list = entry_files[2]
             diff_kwargs.update(entry.get('pars', {}))
         elif num_entries == 2:
             actual, desired = entry
