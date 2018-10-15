@@ -303,7 +303,11 @@ def compare_outputs(outputs, raise_error=True, ignore_keywords=[],
             ),
             {'files': ('jw99999_nircam_f140m-maskbar_i2d.fits',
                        'jw99999_nircam_f140m-maskbar_i2d_ref.fits'),
-             'pars': {'ignore_hdus': ['HDRTAB']}
+             'pars': {'ignore_hdus': ['HDRTAB']},
+            {'files': ('jw99999_nircam_f140m-maskbar_i2d.fits',
+                       'jw99999_nircam_f140m-maskbar_i2d_ref.fits',
+                       ['primary','sci','dq']),
+             'pars': {'rtol': 0.000001}
             },
             {'files': ('jw99999_nircam_f140m-maskbar_i2d.fits[hdrtab]',
                        'jw99999_nircam_f140m-maskbar_i2d_ref.fits[hdrtab]'),
