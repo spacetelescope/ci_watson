@@ -178,6 +178,10 @@ class TestCompareOutputs:
                    {'files': ('j6lq01010_asn.fits[image]',
                               'j6lq01010_asn_mod.fits[IMAGE]'),
                     'pars': {'rtol': 1e-7, 'atol': 0.05}},
+                   {'files': ('j6lq01010_asn.fits',
+                              'j6lq01010_asn_mod.fits',
+                              ['image']),
+                    'pars': {'rtol': 1e-7, 'atol': 0.05}},
                    {'files': ('j6lq01010_asn.txt', 'j6lq01010_asn.txt')},
                    ('j6lq01010_asn.fits', 'j6lq01010_asn_mod.fits',
                     ['primary', 'IMAGE']),
@@ -187,33 +191,88 @@ class TestCompareOutputs:
             verbose=False, raise_error=False)
         s = report.split(os.linesep)
 
-        # TODO: Use regex?
-        assert s[2] == ' a: j6lq01010_asn.fits'
-        assert s[4:8] == [
+        # NOTE: Update as needed from running this test case manually and
+        #       paste expected "s" here as "expected".
+        #       Then, exclude the lines from comparison by inserting "...".
+        #       This is not fool-proof but easier to maintain.
+        expected = [
+            '',
+            ' fitsdiff: ...',
+            ' a: j6lq01010_asn.fits',
+            ' b: .../input/j6lq01010_asn.fits',
             ' Maximum number of different data values to be reported: 10',
             ' Relative tolerance: 0.0, Absolute tolerance: 0.0',
             '',
-            'No differences found.']
-        assert s[9] == 'a: j6lq01010_asn.fits[asn]'
-        assert s[11:14] == [' No differences found.',
-                            '',
-                            'a: j6lq01010_asn.fits[image]']
-        assert s[15:18] == [' No differences found.',
-                            '',
-                            'a: j6lq01010_asn.txt']
-        assert s[19:22] == ['No differences found.',
-                            '',
-                            'a: j6lq01010_asn.fits']
-        assert s[27:31] == [
+            'No differences found.',
+            '',
+            'a: j6lq01010_asn.fits[asn]',
+            'b: .../input/j6lq01010_asn.fits[ASN]',
+            ' No differences found.',
+            '',
+            'a: j6lq01010_asn.fits[image]',
+            'b: .../input/j6lq01010_asn_mod.fits[IMAGE]',
+            ' No differences found.',
+            '',
+            'a: j6lq01010_asn.fits',
+            'b: .../input/j6lq01010_asn_mod.fits',
+            '',
+            ' fitsdiff: ...',
+            ' a: <HDUList object at ...>',
+            ' b: <HDUList object at ...>',
+            ' Maximum number of different data values to be reported: 10',
+            ' Relative tolerance: 1e-07, Absolute tolerance: 0.05',
+            '',
+            'No differences found.',
+            '',
+            'a: j6lq01010_asn.txt',
+            'b: .../input/j6lq01010_asn.txt',
+            'No differences found.',
+            '',
+            'a: j6lq01010_asn.fits',
+            'b: .../input/j6lq01010_asn_mod.fits',
+            '',
+            ' fitsdiff: ...',
+            ' a: <HDUList object at ...>',
+            ' b: <HDUList object at ...>',
             ' Maximum number of different data values to be reported: 10',
             ' Relative tolerance: 0.0, Absolute tolerance: 0.0',
             '',
-            'Extension HDU 1:']
-        assert s[53:56] == [
+            'Extension HDU 1:',
+            '',
+            '   Data contains differences:',
+            '     Data differs at [1, 1]:',
+            '...     a> 0.6085371124054807',
+            '...      ?    ^',
+            '...     b> 0.6585371124054807',
+            '...      ?    ^',
+            '     Data differs at [2, 1]:',
+            '...     a> 0.36385821035372456',
+            '...      ?   ^^              ^',
+            '...     b> 0.41385821035372455',
+            '...      ?   ^^              ^',
+            '     Data differs at [1, 2]:',
+            '...     a> 0.40339636497834697',
+            '...      ?    ^              ^',
+            '...     b> 0.45339636497834696',
+            '...      ?    ^              ^',
+            '     Data differs at [2, 2]:',
+            '...     a> 0.40104384147076577',
+            '...      ?    ^              ^',
+            '...     b> 0.45104384147076576',
+            '...      ?    ^              ^',
             '     4 different pixels found (100.00% different).',
             '',
-            'a: j6lq01010_asn.txt']
-        assert s[57:] == ['No differences found.', '']
+            'a: j6lq01010_asn.txt',
+            'b: .../input/j6lq01010_asn.txt',
+            'No differences found.',
+            '']
+
+        assert len(s) == len(expected), 'Mismatch on expected number of lines'
+
+        for sl, el in zip(s, expected):
+            if '...' in el:
+                continue
+            assert sl == el
 
 
 class TestGenerateUploadParams:
