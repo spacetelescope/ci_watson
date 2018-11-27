@@ -534,7 +534,7 @@ def generate_upload_params(results_root, updated_outputs, verbose=True):
     # Write out JSON file to enable retention of different results.
     # Also rename outputs as new truths.
     for files in updated_outputs:
-        new_truth = os.path.basename(files[1])
+        new_truth = os.path.abspath(files[1])
         schema_pattern.append(new_truth)
         shutil.move(files[0], new_truth)
         if verbose:
