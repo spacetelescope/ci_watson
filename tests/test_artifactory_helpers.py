@@ -302,7 +302,7 @@ class TestGenerateUploadParams:
         schema_pattern, tree, testname = generate_upload_params(
             'groot', updated_outputs, verbose=False)
 
-        assert schema_pattern == ['*.log', 'desired.txt']
+        assert schema_pattern == ['*.log', os.path.abspath('desired.txt')]
         assert isinstance(testname, str)  # Actual value non-deterministic
 
         # TODO: Use regex?
