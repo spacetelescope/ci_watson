@@ -2,7 +2,7 @@
 Helpers for Artifactory or local big data handling.
 """
 import copy
-import datetime
+from datetime import datetime
 import json
 import os
 import re
@@ -38,6 +38,8 @@ UPLOAD_SCHEMA = {"files": [
                      "regexp": "false",
                      "explode": "false",
                      "excludePatterns": []}]}
+
+TODAYS_DATE = datetime.now().strftime("%Y-%m-%d")
 
 
 class BigdataError(Exception):
@@ -515,21 +517,19 @@ def generate_upload_params(results_root, updated_outputs, verbose=True):
 
     # Create instructions for uploading results to artifactory for use
     # as new comparison/truth files
-    time_now = datetime.datetime.now()
     testname = os.path.split(os.path.abspath(os.curdir))[1]
 
     # Meaningful test dir from build info.
     # TODO: Organize results by day test was run. Could replace with git-hash
     whoami = getpass.getuser() or 'nobody'
-    ttime = time_now.strftime("%H_%M_%S")
-    user_tag = 'NOT_CI_{}_{}'.format(whoami, ttime)
+    user_tag = 'NOT_CI_{}'.format(whoami)
     build_tag = os.environ.get('BUILD_TAG', user_tag)
-    build_suffix = os.environ.get('BUILD_MATRIX_SUFFIX', 'standalone')
-    testdir = "{}_{}_{}".format(testname, build_tag, build_suffix)
-
-    dt = time_now.strftime("%d%b%YT")
-    tree = os.path.join(results_root, dt, testdir) + os.sep
-    schema_pattern = ['*.log']
+    build_matrix_suffix = os.environ.get('BUILD_MATRIX_SUFFIX', '0')
+    subdir = '{}_{}_{}'.format(TODAYS_DATE, build_tag, build_matrix_suffix)
+    tree = os.path.join(results_root, subdir, testname) + os.sep
+    schema_pattern = []
+    # Upload all log files
+    schema_pattern.append('*.log')
 
     # Write out JSON file to enable retention of different results.
     # Also rename outputs as new truths.
