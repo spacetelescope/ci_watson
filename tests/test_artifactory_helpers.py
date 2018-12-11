@@ -308,7 +308,7 @@ class TestGenerateUploadParams:
         # TODO: Use regex?
         split_tree = tree.split(os.sep)
         assert split_tree[0] == 'groot'
-        assert split_tree[2].endswith('_tag0_foo')
+        assert split_tree[1].endswith('_tag0_foo')
         assert split_tree[3] == ''
 
         # Make sure file is moved properly.
