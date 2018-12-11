@@ -39,7 +39,7 @@ UPLOAD_SCHEMA = {"files": [
                      "explode": "false",
                      "excludePatterns": []}]}
 
-TIME_NOW = datetime.now()
+TODAYS_DATE = datetime.now().strftime("%Y-%m-%d")
 
 
 class BigdataError(Exception):
@@ -524,9 +524,8 @@ def generate_upload_params(results_root, updated_outputs, verbose=True):
     whoami = getpass.getuser() or 'nobody'
     user_tag = 'NOT_CI_{}'.format(whoami)
     build_tag = os.environ.get('BUILD_TAG', user_tag)
-    date = TIME_NOW.strftime("%Y-%m-%d")
     build_matrix_suffix = os.environ.get('BUILD_MATRIX_SUFFIX', '0')
-    subdir = '{}_{}_{}'.format(date, build_tag, build_matrix_suffix)
+    subdir = '{}_{}_{}'.format(TODAYS_DATE, build_tag, build_matrix_suffix)
     tree = os.path.join(results_root, subdir, testname) + os.sep
     schema_pattern = []
     # Upload all log files
