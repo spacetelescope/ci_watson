@@ -596,4 +596,4 @@ def generate_upload_schema(pattern, target, testname, recursive=False):
 
     # Write out JSON file with description of test results
     with open(jsonfile, 'w') as outfile:
-        json.dump(upload_schema, outfile)
+        json.dump(upload_schema, outfile, indent=2)
