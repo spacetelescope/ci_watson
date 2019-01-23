@@ -29,7 +29,10 @@ class TestJail:
 
     Note that if tests are run in parallel, these results may mean nothing.
     """
-    cwd = os.getcwd()
+
+    @classmethod
+    def setup_class(cls):
+        cls.cwd = os.getcwd()
 
     def test_notintemp(self):
         """Ensure start state."""
