@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 import pytest
 
 
@@ -26,16 +25,22 @@ class TestDirectoryInit:
 
 
 class TestJail:
+    """Test restoring working folders after jailing
 
-    cwd = Path.cwd()
+    Note that if tests are run in parallel, these results may mean nothing.
+    """
+    cwd = os.getcwd()
 
     def test_notintemp(self):
-        assert Path.cwd() == self.cwd
+        """Ensure start state."""
+        assert os.getcwd() == self.cwd
 
     @pytest.mark.usefixtures('_jail')
     def test_intemp(self):
-        assert not len(os.listdir(Path.cwd()))
-        assert Path.cwd() != self.cwd
+        """Ensure that jailing occured"""
+        assert not len(os.listdir(os.getcwd()))
+        assert os.getcwd() != self.cwd
 
     def test_notintemppostjail(self):
-        assert Path.cwd() == self.cwd
+        """Ensure that start state was recovered"""
+        assert os.getcwd() == self.cwd
