@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import pytest
 
 
@@ -22,3 +23,19 @@ class TestDirectoryInit:
     @pytest.mark.parametrize('x', [1, 2])
     def test_cwd_again_starts_empty(self, x):
         assert os.listdir(os.getcwd()) == []
+
+
+class TestJail:
+
+    cwd = Path.cwd()
+
+    def test_notintemp(self):
+        assert Path.cwd() == self.cwd
+
+    @pytest.mark.usefixtures('_jail')
+    def test_intemp(self):
+        assert not len(os.listdir(Path.cwd()))
+        assert Path.cwd() != self.cwd
+
+    def test_notintemppostjail(self):
+        assert Path.cwd() == self.cwd
