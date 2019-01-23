@@ -22,3 +22,28 @@ class TestDirectoryInit:
     @pytest.mark.parametrize('x', [1, 2])
     def test_cwd_again_starts_empty(self, x):
         assert os.listdir(os.getcwd()) == []
+
+
+class TestJail:
+    """Test restoring working folders after jailing
+
+    Note that if tests are run in parallel, these results may mean nothing.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.cwd = os.getcwd()
+
+    def test_notintemp(self):
+        """Ensure start state."""
+        assert os.getcwd() == self.cwd
+
+    @pytest.mark.usefixtures('_jail')
+    def test_intemp(self):
+        """Ensure that jailing occured"""
+        assert not len(os.listdir(os.getcwd()))
+        assert os.getcwd() != self.cwd
+
+    def test_notintemppostjail(self):
+        """Ensure that start state was recovered"""
+        assert os.getcwd() == self.cwd
