@@ -55,8 +55,12 @@ def pytest_runtest_setup(item):
 @pytest.fixture(scope='function')
 def _jail(tmpdir):
     """Perform test in a pristine temporary working directory."""
+    old_dir = os.getcwd()
     os.chdir(tmpdir.strpath)
-    yield
+    try:
+        yield
+    finally:
+        os.chdir(old_dir)
 
 
 @pytest.fixture
