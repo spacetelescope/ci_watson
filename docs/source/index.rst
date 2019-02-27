@@ -36,6 +36,7 @@ The plugin portion of ``ci_watson`` contains:
   directory. This is particularly useful for pipeline tests.
   
 Configuration Options
+---------------------
 
 ``inputs_root``/``results_root`` - The 'bigdata' remote repository name/local
 data root directory for testing input/output files. Setting the value of
