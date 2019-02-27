@@ -63,7 +63,6 @@ Example use within ``pytest.ini``::
   results_root = my_results_repo
 
 
-
 .. _bigdata_setup:
 
 Setting Up For Big Data
