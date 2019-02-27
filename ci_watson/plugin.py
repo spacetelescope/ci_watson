@@ -62,7 +62,6 @@ def pytest_configure(config):
         os.environ["CIWATSON_RESULTS_ROOT"] = config.getini('results_root')[0]
 
 
-
 def pytest_runtest_setup(item):
     if 'slow' in item.keywords and not item.config.getvalue("slow"):
         pytest.skip("need --slow option to run")
