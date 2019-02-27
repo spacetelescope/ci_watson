@@ -59,7 +59,10 @@ class TestGetBigdata:
         self.root = get_bigdata_root()
 
     def test_nocopy(self, _jail):
-        args = ('ci-watson', 'dev', 'input', 'j6lq01010_asn.fits')
+        args = (os.environ['CIWATSON_INPUTS_ROOT'],
+                'dev',
+                'input',
+                'j6lq01010_asn.fits')
         dest = get_bigdata(*args, docopy=False)
         assert dest == os.path.abspath(os.path.join(self.root, *args))
         assert len(os.listdir()) == 0
@@ -74,7 +77,10 @@ class TestGetBigdata:
         This tests download when TEST_BIGDATA is pointing to Artifactory.
         And tests copy when it is pointing to local path.
         """
-        args = ('ci-watson', 'dev', 'input', 'j6lq01010_asn.fits')
+        args = (os.environ['CIWATSON_INPUTS_ROOT'],
+                'dev',
+                'input',
+                'j6lq01010_asn.fits')
         dest = get_bigdata(*args)
         assert dest == os.path.abspath(os.path.join(os.curdir, args[-1]))
 
