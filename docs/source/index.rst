@@ -40,28 +40,34 @@ Configuration Options
 
 ``inputs_root``/``results_root`` - The 'bigdata' remote repository name/local
 data root directory for testing input/output files. Setting the value of
-either option will define the corresponding environment variable during
-test execution.  This environment variable may be used by test code to
-obtain the name of the artifactory repository/local data root directory to
-use when accessing locations needed for running tests.
+either option will make it availble to tests via the ``pytestconfig`` fixture.
+Test code can then obtain the name of the artifactory repository/local data
+root directory to use when accessing locations needed for running tests.
 
 Note: If used, these values should appear in either ``pytest.ini`` OR the appropriate
 section in ``setup.cfg``, *not both*.
 
-* ``inputs_root`` sets environment variable ``CIWATSON_INPUTS_ROOT``.
-* ``results_root`` sets environment variable ``CIWATSON_RESULTS_ROOT``.
-
-Example use within ``setup.cfg``::
+Example configuration within ``setup.cfg``::
 
   [tool:pytest]
   inputs_root = my_data_repo
   results_root = my_results_repo
 
-Example use within ``pytest.ini``::
+Example configuration within ``pytest.ini``::
 
   [pytest]
   inputs_root = my_data_repo
   results_root = my_results_repo
+
+The value(s) defined in the pytest configuration file may be accessed as a list
+by test code via the ``pytestconfig`` fixture which must be passed in as an
+argument to the test method or function that will use the value.
+
+Example of accessing configuration values within tests::
+
+  def test_important_thing(pytestconfig):
+      setup_cfg_inputs_root = pytestconfig.getini('inputs_root')[0]
+      assert setup_cfg_inputs_root == 'my_data_repo'
 
 
 .. _bigdata_setup:
