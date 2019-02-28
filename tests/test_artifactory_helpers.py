@@ -58,8 +58,8 @@ class TestGetBigdata:
     def setup_class(self):
         self.root = get_bigdata_root()
 
-    def test_nocopy(self, _jail):
-        args = (os.environ['CIWATSON_INPUTS_ROOT'],
+    def test_nocopy(self, _jail, pytestconfig):
+        args = (pytestconfig.getini('inputs_root')[0],
                 'dev',
                 'input',
                 'j6lq01010_asn.fits')
@@ -72,12 +72,12 @@ class TestGetBigdata:
         with pytest.raises(BigdataError):
             get_bigdata('fake', 'path', 'somefile.txt', docopy=docopy)
 
-    def test_get_data(self, _jail):
+    def test_get_data(self, _jail, pytestconfig):
         """
         This tests download when TEST_BIGDATA is pointing to Artifactory.
         And tests copy when it is pointing to local path.
         """
-        args = (os.environ['CIWATSON_INPUTS_ROOT'],
+        args = (pytestconfig.getini('inputs_root')[0],
                 'dev',
                 'input',
                 'j6lq01010_asn.fits')

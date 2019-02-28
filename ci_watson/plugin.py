@@ -58,11 +58,6 @@ def pytest_configure(config):
     config.getini('markers').append(
         'bigdata: Run tests that require intranet access')
 
-    if config.getini('inputs_root'):
-        os.environ["CIWATSON_INPUTS_ROOT"] = config.getini('inputs_root')[0]
-    if config.getini('results_root'):
-        os.environ["CIWATSON_RESULTS_ROOT"] = config.getini('results_root')[0]
-
 
 def pytest_runtest_setup(item):
     if 'slow' in item.keywords and not item.config.getvalue("slow"):
