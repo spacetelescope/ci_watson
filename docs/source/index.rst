@@ -71,6 +71,7 @@ Example of accessing configuration values within test code itself::
       
 From within a fixture or a test class the configuration values must be accessed using a slightly different approach::
 
+    import pytest
     inputs_root = pytest.config.getini('inputs_root')[0]
 
 .. _bigdata_setup:
