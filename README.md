@@ -8,7 +8,7 @@ If you ask nicely, it might also help you solve crimes.
 
 Nightly regression test results are available only from within the STScI
 network at this time.
-https://boyle.stsci.edu:8081/job/RT/job/ci-watson/test_results_analyzer/
+https://plwishmaster.stsci.edu:8081/job/RT/job/ci-watson/test_results_analyzer/
 
 ## Installation ##
 
