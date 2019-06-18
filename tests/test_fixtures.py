@@ -5,7 +5,6 @@ import pytest
 def test_envopt(pytestconfig, envopt):
     """Test ``envopt`` fixture that is tied to ``--env`` option."""
     input_env = pytestconfig.getoption('env')
-    assert input_env in ('dev', 'stable')
     assert envopt == input_env
 
 
