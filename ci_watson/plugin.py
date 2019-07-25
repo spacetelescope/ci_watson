@@ -77,7 +77,7 @@ def _jail(tmpdir):
         os.chdir(old_dir)
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def envopt(request):
-    """Get the environment to test."""
+    """Get the ``--env`` command-line option specifying test environment"""
     return request.config.getoption("env")
