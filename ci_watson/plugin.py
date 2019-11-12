@@ -77,7 +77,23 @@ def _jail(tmpdir):
         os.chdir(old_dir)
 
 
+@pytest.fixture
+def bigdata(request):
+    """Setup bigdata fixture for tests to identify if --slow
+    has been specified
+    """
+    return request.config.getoption('--bigdata')
+
+
 @pytest.fixture(scope='session')
 def envopt(request):
     """Get the ``--env`` command-line option specifying test environment"""
     return request.config.getoption("env")
+
+
+@pytest.fixture
+def slow(request):
+    """Setup slow fixture for tests to identify if --slow
+    has been specified
+    """
+    return request.config.getoption('--slow')
