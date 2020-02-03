@@ -72,7 +72,7 @@ def _jail(tmpdir):
     old_dir = os.getcwd()
     os.chdir(tmpdir.strpath)
     try:
-        yield
+        yield tmpdir.strpath
     finally:
         os.chdir(old_dir)
 

@@ -46,3 +46,11 @@ class TestJail:
     def test_notintemppostjail(self):
         """Ensure that start state was recovered"""
         assert os.getcwd() == self.cwd
+
+
+def test_get_jail_as_string(_jail):
+    """Test that the _jail fixture returns the cwd as a string"""
+    cwd = os.getcwd()
+    cwd_jail = _jail
+
+    assert cwd == cwd_jail
