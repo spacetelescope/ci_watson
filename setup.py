@@ -54,8 +54,12 @@ setup(
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
     install_requires=[
-        'pytest>=3'
+        'pytest>=3',
+        'requests',
     ],
+    extras_require={
+        'test': ['astropy']
+    },
     python_requires='>=3.5',
     entry_points={
         'pytest11': [
