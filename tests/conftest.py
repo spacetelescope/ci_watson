@@ -3,6 +3,8 @@ from pytest_astropy_header.display import (PYTEST_HEADER_MODULES,
 
 
 def pytest_configure(config):
+    PYTEST_HEADER_MODULES.pop('Scipy')
+    PYTEST_HEADER_MODULES.pop('Matplotlib')
     PYTEST_HEADER_MODULES.pop('h5py')
     PYTEST_HEADER_MODULES.pop('Pandas')
     PYTEST_HEADER_MODULES['astropy'] = 'astropy'
