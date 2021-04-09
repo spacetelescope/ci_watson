@@ -23,7 +23,7 @@ bc1.test_cmds = ["pytest tests --slow --bigdata --env=stable --basetemp=tests_ou
 bc2 = utils.copy(bc1)
 bc2.name = "dev"
 bc2.conda_packages = ['python=3.8', 'pytest', 'requests', 'numpy']
-bc2.build_cmds = ["pip install git+https://github.com/astropy/astropy.git@main#egg=astropy --no-deps",
+bc2.build_cmds = ["pip install git+https://github.com/astropy/astropy --no-deps",
                   "pip install -e .[test,all]"]
 bc2.test_cmds = ["pytest tests --slow --bigdata --basetemp=tests_output --junitxml results.xml"]
 
