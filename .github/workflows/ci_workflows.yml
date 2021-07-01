@@ -3,10 +3,6 @@ name: CI
 on:
   push:
   pull_request:
-  schedule:
-    # Weekly Wednesday 7 AM build
-    # * is a special character in YAML so you have to quote this string
-    - cron: '0 7 * * 3'
 
 jobs:
   pep:
