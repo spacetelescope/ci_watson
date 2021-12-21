@@ -132,7 +132,7 @@ def download_crds(refname, timeout=30, verbose=False):
 
     # NOTE: For this part to work, jref (for example) must point to
     #       "." or reference file value in FITS header cannot have "jref$".
-    url = 'http://ssb.stsci.edu/cdbs/{}/{}'.format(refdir, fname)
+    url = 'http://ssb.stsci.edu/trds_open/{}/{}'.format(refdir, fname)
     if check_url(url):
         _download(url, fname, timeout=timeout)
     else:
