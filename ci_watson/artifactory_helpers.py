@@ -75,7 +75,9 @@ def retry(retries=RETRY_MAX, delay=RETRY_DELAY, trap=(Exception,)):
                 try:
                     return fn(*args, **kwargs)
                 except trap as e:
-                    print("{}: {}: will try again in {} second(s) [attempt: {} of {}]".format(fn, e, delay, retry + 1, retries), file=sys.stderr)
+                    print("{}: {}: will try again in {} second(s) "
+                          "[attempt: {} of {}]".format(
+                            fn, e, delay, retry + 1, retries), file=sys.stderr)
                     retry += 1
                     time.sleep(delay)
             return fn(*args, **kwargs)
