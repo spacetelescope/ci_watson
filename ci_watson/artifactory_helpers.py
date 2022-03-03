@@ -47,6 +47,24 @@ CHUNK_SIZE = int(os.environ.get("TEST_BIGDATA_CHUNK_SIZE", 16384))
 RETRY_MAX = int(os.environ.get("TEST_BIGDATA_RETRY_MAX", 3))
 RETRY_DELAY = int(os.environ.get("TEST_BIGDATA_RETRY_DELAY", 5))
 
+# Negative value disables timeout (i.e. hang forever)
+if TIMEOUT < 0:
+    TIMEOUT = None
+# Timeout length cannot be zero
+elif not TIMEOUT:
+    TIMEOUT = 1
+
+# Prevent chunks from being smaller than the usual physical block size
+if CHUNK_SIZE < 512:
+    CHUNK_SIZE = 512
+
+# Prevent infinite retry loops
+if RETRY_MAX < 0:
+    RETRY_MAX = 0
+
+# Prevent infinite retry wait
+if RETRY_DELAY < 0:
+    RETRY_DELAY = 0
 
 class BigdataError(Exception):
     """Exception related to big data access."""
