@@ -7,6 +7,8 @@ import json
 import os
 import re
 import shutil
+import sys
+import time
 from difflib import unified_diff
 from io import StringIO
 
@@ -40,6 +42,29 @@ UPLOAD_SCHEMA = {"files": [
                      "excludePatterns": []}]}
 
 TODAYS_DATE = datetime.now().strftime("%Y-%m-%d")
+TIMEOUT = int(os.environ.get("TEST_BIGDATA_TIMEOUT", 30))
+CHUNK_SIZE = int(os.environ.get("TEST_BIGDATA_CHUNK_SIZE", 16384))
+RETRY_MAX = int(os.environ.get("TEST_BIGDATA_RETRY_MAX", 3))
+RETRY_DELAY = int(os.environ.get("TEST_BIGDATA_RETRY_DELAY", 5))
+
+# Negative value disables timeout (i.e. hang forever)
+if TIMEOUT < 0:
+    TIMEOUT = None
+# Timeout length cannot be zero
+elif not TIMEOUT:
+    TIMEOUT = 1
+
+# Prevent chunks from being smaller than the usual physical block size
+if CHUNK_SIZE < 512:
+    CHUNK_SIZE = 512
+
+# Prevent infinite retry loops
+if RETRY_MAX < 0:
+    RETRY_MAX = 0
+
+# Prevent infinite retry wait
+if RETRY_DELAY < 0:
+    RETRY_DELAY = 0
 
 
 class BigdataError(Exception):
@@ -47,7 +72,40 @@ class BigdataError(Exception):
     pass
 
 
-def check_url(url):
+def retry(retries=RETRY_MAX, delay=RETRY_DELAY, trap=(Exception,)):
+    """Execute a function again on error
+
+    Parameters
+    ----------
+    retries: int
+        Maximum number of attempts
+
+    delay: int, float, None
+        Maximum time to wait per attempt (seconds)
+
+    trap: tuple of type Exception
+        Type of exceptions to trap. Untrapped exceptions raise normally.
+        Default: `Exception` (all exceptions)
+    """
+    def decorator(fn):
+        def wrapper(*args, **kwargs):
+            retry = 0
+            while retry < retries:
+                try:
+                    return fn(*args, **kwargs)
+                except trap as e:
+                    print("{}: {}: will try again in {} second(s) "
+                          "[attempt: {} of {}]".format(
+                            fn, e, delay, retry + 1, retries), file=sys.stderr)
+                    retry += 1
+                    time.sleep(delay)
+            return fn(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+@retry()
+def check_url(url, timeout=TIMEOUT):
     """Determine if URL can be resolved without error."""
     if RE_URL.match(url) is None:
         return False
@@ -56,14 +114,15 @@ def check_url(url):
     import requests
 
     # requests.head does not work with Artifactory landing page.
-    r = requests.get(url, allow_redirects=True)
+    r = requests.get(url, allow_redirects=True, timeout=timeout)
     # TODO: Can we simply return r.ok here?
     if r.status_code >= 400:
         return False
     return True
 
 
-def _download(url, dest, timeout=30):
+@retry()
+def _download(url, dest, timeout=TIMEOUT, chunk_size=CHUNK_SIZE):
     """Simple HTTP/HTTPS downloader."""
     # Optional import: requests is not needed for local big data setup.
     import requests
@@ -72,7 +131,7 @@ def _download(url, dest, timeout=30):
 
     with requests.get(url, stream=True, timeout=timeout) as r:
         with open(dest, 'w+b') as data:
-            for chunk in r.iter_content(chunk_size=0x4000):
+            for chunk in r.iter_content(chunk_size=chunk_size):
                 data.write(chunk)
 
     return dest
@@ -102,7 +161,7 @@ def get_bigdata_root(envkey='TEST_BIGDATA'):
     return None
 
 
-def get_bigdata(*args, docopy=True):
+def get_bigdata(*args, docopy=True, timeout=TIMEOUT, chunk_size=CHUNK_SIZE):
     """
     Acquire requested data from a managed resource
     to the current directory.
@@ -160,7 +219,7 @@ def get_bigdata(*args, docopy=True):
         shutil.copy2(src, dest)
 
     elif src_is_url:
-        _download(src, dest)
+        _download(src, dest, timeout, chunk_size)
 
     else:
         raise BigdataError('Failed to retrieve data: {}'.format(src))
