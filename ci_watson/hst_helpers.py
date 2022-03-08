@@ -1,9 +1,17 @@
 """Helper module for HST tests."""
 
 import os
+import glob
+import shutil
+
+import crds
 
 __all__ = ['ref_from_image', 'raw_from_asn', 'download_crds']
 
+import shutil
+
+CRDS_SERVER_URL = "https://hst-crds.stsci.edu"
+HST_INSTRUMENTS = ['acs', 'wfc3', 'stis', 'cos', 'wfpc2']
 
 def _get_reffile(hdr, key):
     """Get ref file from given key in given FITS header."""
@@ -108,6 +116,8 @@ def download_crds(refname, timeout=30, verbose=False):
 
     """
     refdir = None
+    fname = refname
+    print('Deprecation Warning: `timeout` parameter no longer needed.')
 
     # Expand IRAF-style dir shortcut.
     if '$' in refname:
@@ -128,15 +138,39 @@ def download_crds(refname, timeout=30, verbose=False):
     if refdir is None:
         raise ValueError('Unknown HTTP destination for {}'.format(refname))
 
-    from ci_watson.artifactory_helpers import check_url, _download
+    # need to insure CRDS has been cached locally
+    os.environ['CRDS_SERVER_URL'] = CRDS_SERVER_URL
+    os.environ['CRDS_PATH']='./'
+    # Make sure expected output directory is present in local directory
+    tmpbase = os.path.join('references', 'hst')
+    tmpref = os.path.join(tmpbase, HST_INSTRUMENTS[0])
+    try:
+        if not os.path.exists(tmpref):
+            os.makedirs(tmpref)
+        for inst in HST_INSTRUMENTS[1:]:
+            tmppath = os.path.join(tmpbase, inst)
+            if not os.path.exists(tmppath):
+                os.mkdir(tmppath)
 
-    # NOTE: For this part to work, jref (for example) must point to
-    #       "." or reference file value in FITS header cannot have "jref$".
-    url = 'http://ssb.stsci.edu/trds_open/{}/{}'.format(refdir, fname)
-    if check_url(url):
-        _download(url, fname, timeout=timeout)
-    else:
-        raise ValueError('Invalid URL {}'.format(url))
+        # run the command to sync this CRDS file with local directory
+        sync_cmd = crds.sync.SyncScript('sync --files '+ fname)
+        sync_cmd.sync_explicit_files()  # copies file into subdir
 
-    if verbose:
-        print('Downloaded {} from {}'.format(refname, url))
+        # Move the sync'd reference file to locally defined directory now
+        # We need to find it first, though, since we are not sure what
+        # instrument that reference file was for...
+        tmpfile = glob.glob(os.path.join(tmpbase, '*', '*.fits'))[0]
+        shutil.move(tmpfile, refname)
+
+        if verbose:
+            print('Downloaded {} from {}'.format(refname, url))
+
+    except Exception:
+        print(f"Failed to download {fname}")
+
+    finally:
+        # delete tmp CRDS directories now, if possible.
+        try:
+            shutil.rmtree('references')
+        except Exception:
+            pass
