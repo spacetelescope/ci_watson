@@ -12,6 +12,7 @@ __all__ = ['ref_from_image', 'raw_from_asn', 'download_crds']
 CRDS_SERVER_URL = "https://hst-crds.stsci.edu"
 HST_INSTRUMENTS = ['acs', 'wfc3', 'stis', 'cos', 'wfpc2']
 
+
 def _get_reffile(hdr, key):
     """Get ref file from given key in given FITS header."""
     ref_file = None
