@@ -6,9 +6,8 @@ import shutil
 
 import crds
 
-__all__ = ['ref_from_image', 'raw_from_asn', 'download_crds']
 
-import shutil
+__all__ = ['ref_from_image', 'raw_from_asn', 'download_crds']
 
 CRDS_SERVER_URL = "https://hst-crds.stsci.edu"
 HST_INSTRUMENTS = ['acs', 'wfc3', 'stis', 'cos', 'wfpc2']
@@ -140,7 +139,7 @@ def download_crds(refname, timeout=30, verbose=False):
 
     # need to insure CRDS has been cached locally
     os.environ['CRDS_SERVER_URL'] = CRDS_SERVER_URL
-    os.environ['CRDS_PATH']='./'
+    os.environ['CRDS_PATH'] = '.' + os.sep
     # Make sure expected output directory is present in local directory
     tmpbase = os.path.join('references', 'hst')
     tmpref = os.path.join(tmpbase, HST_INSTRUMENTS[0])
@@ -153,7 +152,7 @@ def download_crds(refname, timeout=30, verbose=False):
                 os.mkdir(tmppath)
 
         # run the command to sync this CRDS file with local directory
-        sync_cmd = crds.sync.SyncScript('sync --files '+ fname)
+        sync_cmd = crds.sync.SyncScript('sync --files ' + fname)
         sync_cmd.sync_explicit_files()  # copies file into subdir
 
         # Move the sync'd reference file to locally defined directory now
@@ -163,7 +162,7 @@ def download_crds(refname, timeout=30, verbose=False):
         shutil.move(tmpfile, refname)
 
         if verbose:
-            print('Downloaded {} from {}'.format(refname, url))
+            print('Downloaded {} from {}'.format(refname, CRDS_SERVER_URL))
 
     except Exception:
         print(f"Failed to download {fname}")
