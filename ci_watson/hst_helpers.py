@@ -3,6 +3,7 @@
 import os
 import glob
 import shutil
+import warnings
 
 import crds
 
@@ -117,7 +118,7 @@ def download_crds(refname, timeout=30, verbose=False):
     """
     refdir = None
     fname = refname
-    print('Deprecation Warning: `timeout` parameter no longer needed.')
+    warnings.warn('Deprecation Warning: `timeout` parameter no longer needed.')
 
     # Expand IRAF-style dir shortcut.
     if '$' in refname:
@@ -139,8 +140,9 @@ def download_crds(refname, timeout=30, verbose=False):
         raise ValueError('Unknown HTTP destination for {}'.format(refname))
 
     # need to insure CRDS has been cached locally
-    os.environ['CRDS_SERVER_URL'] = CRDS_SERVER_URL
-    os.environ['CRDS_PATH'] = '.' + os.sep
+    if 'CRDS_SERVER_URL' not in os.environ:
+        os.environ['CRDS_SERVER_URL'] = CRDS_SERVER_URL
+        os.environ['CRDS_PATH'] = '.' + os.sep
     # Make sure expected output directory is present in local directory
     tmpbase = os.path.join('references', 'hst')
     tmpref = os.path.join(tmpbase, HST_INSTRUMENTS[0])
