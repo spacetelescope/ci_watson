@@ -78,7 +78,7 @@ jobs:
     - name: Install and build
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        pip install git+https://github.com/astropy/astropy --no-deps
+        pip install -U -i https://pypi.anaconda.org/astropy/simple astropy --pre
         python -m pip install -e .[test,all]
     # --bigdata untestable due to Artifactory lockdown
     - name: Test
