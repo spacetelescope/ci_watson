@@ -12,8 +12,8 @@ bc1 = new BuildConfig()
 bc1.nodetype = "RHEL-6"
 bc1.name = "stable"
 bc1.env_vars = ['TEST_BIGDATA=https://bytesalad.stsci.edu/artifactory']
-bc1.conda_channels = ['http://ssb.stsci.edu/astroconda']
-bc1.conda_packages = ['python=3.7', 'pytest', 'requests', 'numpy', 'astropy']
+bc1.conda_channels = ['http://conda.anaconda.org/conda-forge/']
+bc1.conda_packages = ['python=3.11', 'pytest', 'requests', 'numpy', 'astropy']
 bc1.build_cmds = ["pip install -e .[test,all]"]
 bc1.test_cmds = ["pytest tests --slow --bigdata --env=stable --basetemp=tests_output --junitxml results.xml"]
 bc1.failedUnstableThresh = 1
@@ -23,7 +23,7 @@ bc1.failedFailureThresh = 6
 // Also test another version of Python.
 bc2 = utils.copy(bc1)
 bc2.name = "dev"
-bc2.conda_packages = ['python=3.8', 'pytest', 'requests', 'numpy']
+bc2.conda_packages = ['python=3.9', 'pytest', 'requests', 'numpy']
 bc2.build_cmds = ["pip install -i https://pypi.anaconda.org/astropy/simple astropy --pre --no-deps",
                   "pip install -e .[test,all]"]
 bc2.test_cmds = ["pytest tests --slow --bigdata --basetemp=tests_output --junitxml results.xml"]
