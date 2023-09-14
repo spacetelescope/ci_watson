@@ -1,0 +1,7 @@
+# Use Bi-weekly numpy dev builds
+--extra-index-url https://pypi.anaconda.org/scientific-python-nightly-wheels/simple
+numpy>=0.0.dev0
+
+# Use nightly astropy dev build
+--extra-index-url https://pypi.anaconda.org/astropy/simple
+astropy>=0.0.dev0
