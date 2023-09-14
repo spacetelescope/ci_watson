@@ -9,24 +9,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
+  pep:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
     with:
       envs: |
         - linux: check-style
         - linux: check-build
-  test:
+  basic_tests:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
     with:
       envs: |
         - linux: py39-xdist
         - linux: py310-xdist
         - linux: py311-xdist
-        - macos: py311-xdist
+        - linux: py3-xdist
+        - macos: py3-xdist
+  tests:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      envs: |
         - linux: py3-slow-stable-cov-xdist
           coverage: codecov
           pytest-results-summary: true
-        - macos: py3-xdist
+  devdep_tests:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      envs: |
         - linux: py3-slow-devdeps-xdist
           pytest-results-summary: true
 
