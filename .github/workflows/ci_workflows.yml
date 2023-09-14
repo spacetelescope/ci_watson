@@ -4,82 +4,29 @@ on:
   push:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  pep:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-    - name: Lint with flake8
-      run: |
-        python -m pip install --upgrade pip flake8
-        flake8 ci_watson --count
-    # Make sure that packaging will work
-    - name: pep517 build
-      run: |
-        python -m pip install --upgrade setuptools build "twine>=3.3"
-        python -m build .
-        twine check --strict dist/*
+  check:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      envs: |
+        - linux: check-style
+        - linux: check-build
+  test:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      envs: |
+        - linux: py39-xdist
+        - linux: py310-xdist
+        - linux: py311-xdist
+        - macos: py311-xdist
+        - linux: py3-slow-stable-cov-xdist
+          coverage: codecov
+          pytest-results-summary: true
+        - macos: py3-xdist
+        - linux: py3-slow-devdeps-xdist
+          pytest-results-summary: true
 
-  basic_tests:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-    - name: Install and build
-      run: |
-        python -m pip install --upgrade pip setuptools wheel
-        python -m pip install -e .[test,all]
-    - name: Test
-      run: pytest tests
-
-  tests:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-    - name: Install and build
-      run: |
-        python -m pip install --upgrade pip setuptools wheel
-        python -m pip install -e .[test,all]
-    # --bigdata untestable due to Artifactory lockdown
-    - name: Test
-      run: pytest tests --slow --env=stable --basetemp=tests_output --junitxml results.xml
-
-  devdep_tests:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    - name: Install and build
-      run: |
-        python -m pip install --upgrade pip setuptools wheel
-        python -m pip install -r requirements-dev.txt -U --upgrade-strategy eager
-        python -m pip install -e .[test,all]
-    # --bigdata untestable due to Artifactory lockdown
-    - name: Test
-      run: pytest tests --slow --basetemp=tests_output --junitxml results.xml
