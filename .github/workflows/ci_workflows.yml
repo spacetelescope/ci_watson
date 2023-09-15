@@ -2,6 +2,10 @@ name: CI
 
 on:
   push:
+    branches:
+    - master
+    tags:
+    - '*'
   pull_request:
 
 concurrency:
@@ -9,32 +13,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  pep:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
-    with:
-      envs: |
-        - linux: check-style
-        - linux: check-build
-  basic_tests:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
-    with:
-      envs: |
-        - linux: py39-xdist
-        - linux: py310-xdist
-        - linux: py311-xdist
-        - linux: py3-xdist
-        - macos: py3-xdist
   tests:
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
     with:
+      submodules: false
+      coverage: ''
       envs: |
-        - linux: py3-slow-stable-cov-xdist
-          coverage: codecov
-          pytest-results-summary: true
-  devdep_tests:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
-    with:
-      envs: |
-        - linux: py3-slow-devdeps-xdist
-          pytest-results-summary: true
+        # PEP
+        - linux: check-style
+        - linux: check-build
 
+        # Basic tests (Windows not supported)
+        - linux: py39-test
+        - macos: py310-test
+        - linux: py311-test
+
+        # --bigdata untestable due to Artifactory lockdown
+        - linux: py310-slow-stable
+
+        # Test with dev versions of upstream dependencies
+        - linux: py311-slow-devdeps
