@@ -3,7 +3,6 @@
 import os
 import glob
 import shutil
-import warnings
 
 import crds
 
@@ -91,7 +90,7 @@ def raw_from_asn(asn_file, suffix='_raw.fits'):
     return raw_files
 
 
-def download_crds(refname, timeout=30, verbose=False):
+def download_crds(refname, *, verbose=False):
     """
     Download a CRDS file from HTTP to current directory.
 
@@ -107,10 +106,6 @@ def download_crds(refname, timeout=30, verbose=False):
         But only filename with ``dir$name`` format would
         proceed to download stage.
 
-    timeout : int or `None`
-        Number of seconds before timeout error is raised.
-        If `None`, no timeout happens but this is not recommended.
-
     verbose : bool
         If `True`, print messages to screen.
         This is useful for debugging.
@@ -118,7 +113,6 @@ def download_crds(refname, timeout=30, verbose=False):
     """
     refdir = None
     fname = refname
-    warnings.warn('Deprecation Warning: `timeout` parameter no longer needed.')
 
     # Expand IRAF-style dir shortcut.
     if '$' in refname:

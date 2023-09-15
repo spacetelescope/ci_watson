@@ -2,84 +2,34 @@ name: CI
 
 on:
   push:
+    branches:
+    - master
+    tags:
+    - '*'
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  pep:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-    - name: Lint with flake8
-      run: |
-        python -m pip install --upgrade pip flake8
-        flake8 ci_watson --count
-    # Make sure that packaging will work
-    - name: pep517 build
-      run: |
-        python -m pip install --upgrade setuptools build "twine>=3.3"
-        python -m build .
-        twine check --strict dist/*
-
-  basic_tests:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-    - name: Install and build
-      run: |
-        python -m pip install --upgrade pip setuptools wheel
-        python -m pip install -e .[test,all]
-    - name: Test
-      run: pytest tests
-
   tests:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-    - name: Install and build
-      run: |
-        python -m pip install --upgrade pip setuptools wheel
-        python -m pip install -e .[test,all]
-    # --bigdata untestable due to Artifactory lockdown
-    - name: Test
-      run: pytest tests --slow --env=stable --basetemp=tests_output --junitxml results.xml
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      submodules: false
+      coverage: ''
+      envs: |
+        # PEP
+        - linux: check-style
+        - linux: check-build
 
-  devdep_tests:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    - name: Install and build
-      run: |
-        python -m pip install --upgrade pip setuptools wheel
-        python -m pip install -r requirements-dev.txt -U --upgrade-strategy eager
-        python -m pip install -e .[test,all]
-    # --bigdata untestable due to Artifactory lockdown
-    - name: Test
-      run: pytest tests --slow --basetemp=tests_output --junitxml results.xml
+        # Basic tests (Windows not supported)
+        - linux: py39-test
+        - macos: py310-test
+        - linux: py311-test
+
+        # --bigdata untestable due to Artifactory lockdown
+        - linux: py310-slow-stable
+
+        # Test with dev versions of upstream dependencies
+        - linux: py311-slow-devdeps
