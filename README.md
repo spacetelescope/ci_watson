@@ -15,7 +15,3 @@ https://plwishmaster.stsci.edu:8081/job/RT/job/ci_watson/test_results_analyzer/
 With `pip`::
 
     pip install ci-watson
-
-With `conda`::
-
-    conda install ci-watson -c http://ssb.stsci.edu/astroconda
