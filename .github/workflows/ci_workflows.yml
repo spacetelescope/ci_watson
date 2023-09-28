@@ -32,4 +32,6 @@ jobs:
         - linux: py310-slow-stable
 
         # Test with dev versions of upstream dependencies
-        - linux: py311-slow-devdeps
+        - linux: py312-slow-devdeps
+          python-version: '3.12-dev'
+          posargs: --verbose
