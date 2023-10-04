@@ -33,5 +33,4 @@ jobs:
 
         # Test with dev versions of upstream dependencies
         - linux: py312-slow-devdeps
-          python-version: '3.12-dev'
           posargs: --verbose
