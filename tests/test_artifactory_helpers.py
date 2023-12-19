@@ -59,7 +59,7 @@ class TestGetBigdata:
         self.root = get_bigdata_root()
 
     def test_nocopy(self, _jail, pytestconfig):
-        args = (pytestconfig.getini('inputs_root')[0],
+        args = (pytestconfig.getini('inputs_root'),
                 'dev',
                 'input',
                 'j6lq01010_asn.fits')
@@ -77,7 +77,7 @@ class TestGetBigdata:
         This tests download when TEST_BIGDATA is pointing to Artifactory.
         And tests copy when it is pointing to local path.
         """
-        args = (pytestconfig.getini('inputs_root')[0],
+        args = (pytestconfig.getini('inputs_root'),
                 'dev',
                 'input',
                 'j6lq01010_asn.fits')

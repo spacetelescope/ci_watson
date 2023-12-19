@@ -59,20 +59,20 @@ Example configuration within ``pytest.ini``::
   inputs_root = my_data_repo
   results_root = my_results_repo
 
-The value(s) defined in the pytest configuration file may be accessed as a list
+The value(s) defined in the pytest configuration file may be accessed as a string
 by test code via the ``pytestconfig`` fixture which must be passed in as an
 argument to the test method or function that will use the value.
 
 Example of accessing configuration values within test code itself::
 
   def test_important_thing(pytestconfig):
-      setup_cfg_inputs_root = pytestconfig.getini('inputs_root')[0]
+      setup_cfg_inputs_root = pytestconfig.getini('inputs_root')
       assert setup_cfg_inputs_root == 'my_data_repo'
       
 From within a fixture or a test class the configuration values must be accessed using a slightly different approach::
 
     import pytest
-    inputs_root = pytest.config.getini('inputs_root')[0]
+    inputs_root = pytest.config.getini('inputs_root')
 
 .. _bigdata_setup:
 
