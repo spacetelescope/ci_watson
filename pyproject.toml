@@ -4,7 +4,7 @@ requires = ["setuptools",
             "wheel"]
 build-backend = 'setuptools.build_meta'
 
-[tool.ruff]
+[tool.ruff.lint]
 select = [
   "E9", # syntax / io error
   "F63", # assertion traps
