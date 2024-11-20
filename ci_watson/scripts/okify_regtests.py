@@ -144,7 +144,7 @@ def artifactory_download_run_files(
         capture_output=True,
     )
 
-    return sorted(Path.cwd().glob(f"**/*{suffix}"))
+    return sorted(Path().rglob(f'*{suffix}'))
 
 
 def artifactory_download_regtest_artifacts(
