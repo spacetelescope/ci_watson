@@ -16,9 +16,11 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "pytest>=6",
-    "requests",
     "crds",
+    "colorama>=0.4.1",
+    "pytest>=6",
+    "readchar>=3.0",
+    "requests",
 ]
 dynamic = [
     "version",
@@ -37,6 +39,9 @@ Homepage = "https://github.com/spacetelescope/ci_watson"
 
 [project.entry-points.pytest11]
 pytest_ciwatson = "ci_watson.plugin"
+
+[project.scripts]
+okify_regtests = "ci_watson.scripts.okify_regtests:main"
 
 [project.optional-dependencies]
 all = [
