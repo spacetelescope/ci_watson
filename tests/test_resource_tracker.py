@@ -5,8 +5,8 @@ import pytest
 
 from ci_watson.resource_tracker import (
     ResourceTracker,
-    TrackPeakMemory,
-    TrackRuntime,
+    _TrackPeakMemory,
+    _TrackRuntime,
 )
 
 
@@ -21,7 +21,7 @@ class FakeRequest:
 
 
 def test_runtime():
-    tracker = TrackRuntime()
+    tracker = _TrackRuntime()
     with tracker:
         time.sleep(1.0)
     # a 1 second sleep is sometimes too much to ask
@@ -32,7 +32,7 @@ def test_runtime():
 
 
 def test_memory():
-    tracker = TrackPeakMemory()
+    tracker = _TrackPeakMemory()
     N = 1024 * 1024
     with tracker:
         b = b"0" * N  # noqa: F841

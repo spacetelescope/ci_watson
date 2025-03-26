@@ -49,10 +49,10 @@ import tracemalloc
 from contextlib import ExitStack, contextmanager
 
 
-__all__ = ["TrackRuntime", "TrackPeakMemory", "ResourceTracker"]
+__all__ = ["ResourceTracker"]
 
 
-class TrackRuntime:
+class _TrackRuntime:
     """Runtime tracker context."""
 
     def __enter__(self):
@@ -65,7 +65,7 @@ class TrackRuntime:
         return ("tracked-time", self.value)
 
 
-class TrackPeakMemory:
+class _TrackPeakMemory:
     """Peak memory tracker context."""
 
     def __enter__(self):
@@ -83,7 +83,7 @@ class ResourceTracker:
     """Track resources used during track context."""
 
     def __init__(self):
-        self._trackers = [TrackPeakMemory(), TrackRuntime()]
+        self._trackers = [_TrackPeakMemory(), _TrackRuntime()]
 
     def log(self, request):
         """Log tracked resource usage to the pytest request user properties.
