@@ -5,36 +5,38 @@ run Steps or Pipelines) or within tests.
 
 For uses where the resource usage occurs within a test:
 
->>>
->> def test_long_step(resource_tracker, request):
->>     with resource_tracker.track(log=request):
->>         # something that takes memory and time
->>         pass
+.. code-block:: python
+
+    def test_long_step(resource_tracker, request):
+        with resource_tracker.track(log=request):
+            # something that takes memory and time
+            pass
 
 For a module-scoped fixture the resource tracking can
 be performed in the fixture but the logging/reporting of
 the resource usage must occur during a test:
 
->>>
->> @pytest.fixture(scope="module")
->> def resource_tracker():
->>     return ResourceTracker()
->>
->> @pytest.fixture()
->> def log_tracked_resources(resource_tracker, request):
->>     def callback():
->>         resource_tracker.log(request)
->>
->>     yield callback
->>
->> @pytest.fixture
->> def my_long_fixture(resource_tracker):
->>     with resource_tracker.track():
->>         # something that takes memory and time
->>         pass
->>
->> def test_log_tracked_resources(log_tracked_resources, my_long_fixture):
->>     log_tracked_resources()
+.. code-block:: python
+
+    @pytest.fixture(scope="module")
+    def resource_tracker():
+        return ResourceTracker()
+
+    @pytest.fixture()
+    def log_tracked_resources(resource_tracker, request):
+        def callback():
+            resource_tracker.log(request)
+
+        yield callback
+
+    @pytest.fixture
+    def my_long_fixture(resource_tracker):
+        with resource_tracker.track():
+            # something that takes memory and time
+            pass
+
+    def test_log_tracked_resources(log_tracked_resources, my_long_fixture):
+        log_tracked_resources()
 
 Use of the module-scoped fixture has fixture-reuse
 considerations similar to the ``rtdata_module`` fixture. Having
