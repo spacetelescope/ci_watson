@@ -1,3 +1,8 @@
+0.9.0 (unreleased)
+==================
+
+- Add ``resource_tracker`` and ``log_tracked_resources`` fixtures. [#74]
+
 0.8.0 (2024-12-09)
 ==================
 

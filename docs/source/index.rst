@@ -34,6 +34,8 @@ The plugin portion of ``ci_watson`` contains:
   the author of the test to use this environment setting properly.
 * ``_jail`` fixture to enable a test to run in a pristine temporary working
   directory. This is particularly useful for pipeline tests.
+* ``resource_tracker`` and ``log_tracked_resources`` fixtures to track
+  memory and runtime and log them in the junit xml results file.
   
 Configuration Options
 ---------------------
@@ -99,4 +101,7 @@ Reference/API
     :no-inheritance-diagram:
 
 .. automodapi:: ci_watson.jwst_helpers
+    :no-inheritance-diagram:
+
+.. automodapi:: ci_watson.resource_tracker
     :no-inheritance-diagram:
