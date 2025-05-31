@@ -6,7 +6,6 @@ import tempfile
 from argparse import ArgumentParser
 from contextlib import contextmanager
 from enum import Enum
-from glob import glob
 from pathlib import Path
 
 import asdf
