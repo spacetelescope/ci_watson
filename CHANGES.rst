@@ -2,7 +2,7 @@
 ==================
 
 - Add ``resource_tracker`` and ``log_tracked_resources`` fixtures. [#74]
-- Add new ``--version`` and ``--dlpath`` options for
+- Add new ``--version`` and ``--output-dir`` options for
   ``okify_regtests`` CLI. [#84]
 
 0.8.0 (2024-12-09)
