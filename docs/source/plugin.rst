@@ -45,15 +45,15 @@ root directory to use when accessing locations needed for running tests.
 
 Example configuration within ``pyproject.toml``::
 
-  [tool.pytest.ini_options]
-  inputs_root = my_data_repo
-  results_root = my_results_repo
+    [tool.pytest.ini_options]
+    inputs_root = my_data_repo
+    results_root = my_results_repo
 
 Example configuration within ``pytest.ini``::
 
-  [pytest]
-  inputs_root = my_data_repo
-  results_root = my_results_repo
+    [pytest]
+    inputs_root = my_data_repo
+    results_root = my_results_repo
 
 The value(s) defined in the pytest configuration file may be accessed as a list
 by test code via the ``pytestconfig`` fixture which must be passed in as an
@@ -63,9 +63,9 @@ Example of accessing configuration values within test code itself:
 
 .. code-block:: python
 
-  def test_important_thing(pytestconfig):
-      setup_cfg_inputs_root = pytestconfig.getini('inputs_root')[0]
-      assert setup_cfg_inputs_root == 'my_data_repo'
+    def test_important_thing(pytestconfig):
+        setup_cfg_inputs_root = pytestconfig.getini('inputs_root')[0]
+        assert setup_cfg_inputs_root == 'my_data_repo'
 
 From within a fixture or a test class the configuration values must be accessed
 using a slightly different approach:
