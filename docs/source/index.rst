@@ -25,9 +25,48 @@ To cite this package, please use its Zenodo DOI available at
 https://zenodo.org/doi/10.5281/zenodo.12699836 .
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 1
+    :hidden:
 
-   plugin
-   bigdata
-   scripts
-   ref_api
+    plugin
+    bigdata
+    scripts
+    ref_api
+
+.. grid:: 2
+
+    .. grid-item-card::
+
+        .. button-ref:: plugin
+            :expand:
+            :color: primary
+            :click-parent:
+
+            ``pytest`` plugin
+
+    .. grid-item-card::
+
+        .. button-ref:: bigdata
+            :expand:
+            :color: primary
+            :click-parent:
+
+            Handling big data
+
+    .. grid-item-card::
+
+        .. button-ref:: scripts
+            :expand:
+            :color: primary
+            :click-parent:
+
+            Scripts (e.g., okify_regtests)
+
+    .. grid-item-card::
+
+        .. button-ref:: ref_api
+            :expand:
+            :color: primary
+            :click-parent:
+
+            Reference/API

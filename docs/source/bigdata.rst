@@ -1,7 +1,7 @@
 .. _bigdata_setup:
 
-Setting Up For Big Data
-=======================
+Big Data
+========
 
 The ``--bigdata`` option is used together with the environment variable,
 ``TEST_BIGDATA``, as used by

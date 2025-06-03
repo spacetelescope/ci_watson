@@ -31,7 +31,9 @@ extensions = ['sphinx.ext.autodoc',
               'numpydoc',
               'sphinx.ext.intersphinx',
               'sphinx.ext.imgmath',
-              'sphinx.ext.viewcode']
+              'sphinx.ext.viewcode',
+              "sphinx_design",
+              "sphinx_copybutton"]
 numpydoc_show_class_members = False
 
 # Add any paths that contain templates here, relative to this directory.
@@ -57,6 +59,7 @@ author = 'STScI'
 release = ci_watson.__version__
 # The short X.Y version.
 version = '.'.join(release.split('.')[:2])
+dev = "dev" in release
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -69,25 +72,56 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
+suppress_warnings = ['design.grid', ]
 
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'pydata_sphinx_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    "collapse_navigation": True,
+    "icon_links": [],
+    "navigation_depth": 2,
+    "show_nav_level": 2,
+    "use_edit_page_button": False,
+    "github_url": "https://github.com/spacetelescope/ci_watson",
+    "external_links": [
+        {"name": "Help Desk", "url": "http://jwsthelp.stsci.edu/"},
+    ],
+    # https://github.com/pydata/pydata-sphinx-theme/issues/1492
+    "navigation_with_keys": False,
+}
+
+html_context = {
+    "default_mode": "light",
+    "to_be_indexed": ["stable", "latest"],
+    "is_development": dev,
+    "github_user": "spacetelescope",
+    "github_repo": "ci_watson",
+    "github_version": "main",
+    "doc_path": "docs",
+}
+
+# Hide primary sidebar
+html_sidebars = {
+  "**": []
+}
+
+html_copy_source = False
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
-
+html_css_files = ["ci_watson.css"]
+html_logo = "_static/stsci_logo.png"
 
 # -- Options for HTMLHelp output ------------------------------------------
 
