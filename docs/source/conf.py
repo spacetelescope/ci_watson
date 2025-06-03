@@ -13,7 +13,11 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+import subprocess
 from datetime import datetime
+
+from docutils import nodes
+from sphinx.util.docutils import SphinxDirective
 
 import ci_watson
 
@@ -72,8 +76,6 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
-suppress_warnings = ['design.grid', ]
-
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -123,39 +125,31 @@ html_static_path = ['_static']
 html_css_files = ["ci_watson.css"]
 html_logo = "_static/stsci_logo.png"
 
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {'python': ('https://docs.python.org/', None)}
+
+# Report broken ref as errors.
+nitpicky = True
+
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'ci_watsondoc'
 
 
-# -- Options for LaTeX output ---------------------------------------------
+# -- Custom directive -------------------------------------------
 
-latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
+class CIWatsonCLIHelpDirective(SphinxDirective):
 
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
+    def run(self):
+        help_text = subprocess.check_output(
+            ["okify_regtests", "--help"], encoding="utf-8")
+        paragraph_node = nodes.literal_block(text=help_text)
+        return [paragraph_node]
 
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
 
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
-}
-
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title,
-#  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, 'ci_watson.tex', 'ci\\_watson Documentation',
-     'STScI', 'manual'),
-]
+def setup(app):
+    app.add_directive('okifyregtestsclihelp', CIWatsonCLIHelpDirective)
 
 
 # -- Options for manual page output ---------------------------------------
@@ -166,22 +160,3 @@ man_pages = [
     (master_doc, 'ci_watson', 'ci_watson Documentation',
      [author], 1)
 ]
-
-
-# -- Options for Texinfo output -------------------------------------------
-
-# Grouping the document tree into Texinfo files. List of tuples
-# (source start file, target name, title, author,
-#  dir menu entry, description, category)
-texinfo_documents = [
-    (master_doc, 'ci_watson', 'ci_watson Documentation',
-     author, 'ci_watson', 'One line description of project.',
-     'Miscellaneous'),
-]
-
-
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'python': ('https://docs.python.org/', None)}
-
-# Report broken ref as errors.
-nitpicky = True

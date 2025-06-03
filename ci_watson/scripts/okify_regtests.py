@@ -254,7 +254,7 @@ def artifactory_download_regtest_artifacts(
 
 
 @contextmanager
-def pushd(newdir: os.PathLike):
+def pushd(newdir: os.PathLike | str):
     """Transient context that emulates ``pushd`` with ``chdir``."""
 
     prevdir = os.getcwd()
@@ -296,26 +296,28 @@ def main():
         help="Do nothing (passes the --dry-run flag to JFrog CLI).",
     )
     parser.add_argument(
-        "--dlpath",
+        "--output-dir",
         type=str,
         default="",
-        help=("Store downloaded artifacts in the given path instead of "
-              "temporary directory. The path must already exist."),
+        help=("Store downloaded artifacts in the given path. "
+              "Defaults to a temporary directory."),
     )
 
     args = parser.parse_args()
     run = args.run_number
     observatory = args.observatory
 
-    if args.dlpath:
-        ctx = nullcontext()
-    else:
+    if args.output_dir == "":
         ctx = tempfile.TemporaryDirectory()
+    else:
+        ctx = nullcontext()
 
     # Create and chdir to a temporary directory to store specfiles
     with ctx as tmp_path:
-        if not tmp_path:
-            tmp_path = args.dlpath
+        if tmp_path is None:
+            tmp_path = args.output_dir
+            if not os.path.exists(tmp_path):
+                os.makedirs(tmp_path)
 
         print(f"Downloading test logs to {tmp_path}")
 

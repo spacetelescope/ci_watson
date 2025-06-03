@@ -19,25 +19,13 @@ results, by overwriting truth files on Artifactory so that a set of
 failing regression test results becomes correct. It requires
 JFrog CLI (https://jfrog.com/getcli/) configured with valid credentials
 (``jf login``) and write access to the desired truth file repository
-(``jwst-pipeline`` or``roman-pipeline``).
+(``jwst-pipeline``, ``roman-pipeline``, etc.).
 
-The CLI syntax::
+To see the syntax and usage, from a terminal, type::
 
-    okify_regtests [-h] [--version] [--dry-run] [--dlpath DLPATH] {jwst,roman} run-number
+    okify_regtests --help
 
-Positional arguments:
-
-* ``{jwst,roman}``: Observatory to overwrite truth files for on Artifactory.
-* ``run-number``: GitHub Actions job number of regression test run (see
-  https://github.com/spacetelescope/RegressionTests/actions).
-
-Options:
-
-* ``-h``: Show help message and exit.
-* ``--version``: Print package version and exit.
-* ``--dry-run``: Do nothing (passes the ``--dry-run`` flag to JFrog CLI).
-* ``--dlpath DLPATH``: Store downloaded artifacts in the given path instead
-  of temporary directory. The path must already exist.
+.. okifyregtestsclihelp::
 
 Example for ``jwst``::
 
