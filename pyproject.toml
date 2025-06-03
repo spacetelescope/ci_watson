@@ -41,7 +41,7 @@ okify_regtests = "ci_watson.scripts.okify_regtests:main"
 
 [project.optional-dependencies]
 all = [
-    "astropy",
+    "astropy>=6",
 ]
 test = [
     "pytest-astropy-header",

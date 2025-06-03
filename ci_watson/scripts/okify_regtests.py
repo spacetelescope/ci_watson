@@ -4,13 +4,17 @@ import shutil
 import subprocess
 import tempfile
 from argparse import ArgumentParser
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from enum import Enum
 from pathlib import Path
 
 import asdf
 import readchar
 from colorama import Fore
+
+import ci_watson
+
+__all__ = []
 
 JSON_SPEC_FILE_SUFFIX = "_okify.json"
 ASDF_BREADCRUMB_FILE_SUFFIX = "_rtdata.asdf"
@@ -26,7 +30,7 @@ class Observatory(Enum):
 
     @property
     def runs_directory(self) -> str:
-        """directory on Artifactory where run results are stored"""
+        """Directory on Artifactory where run results are stored."""
         if self == Observatory.jwst:
             return "jwst-pipeline-results/"
         elif self == Observatory.roman:
@@ -35,13 +39,25 @@ class Observatory(Enum):
             raise NotImplementedError(f"runs directory not defined for '{self}'")
 
 
-def artifactory_copy(json_spec_file: os.PathLike, dry_run: bool = False):
+def artifactory_copy(
+    json_spec_file: os.PathLike,
+    dry_run: bool = False,
+):
     """
-    copy files with `jf rt cp` based on instructions in the specfile
+    Copy files with ``jf rt cp`` based on instructions in the specfile.
 
-    :param json_spec_file: JSON file indicating file transfer patterns and targets (see https://docs.jfrog-applications.jfrog.io/jfrog-applications/jfrog-cli/cli-for-jfrog-artifactory/using-file-specs)
-    :param dry_run: do nothing (passes `--dry-run` to JFrog CLI)
-    :raises CalledProcessError: if JFrog command fails
+    Parameters
+    ----------
+    json_spec_file : Path
+        JSON file indicating file transfer patterns and targets
+        (see https://docs.jfrog-applications.jfrog.io/jfrog-applications/jfrog-cli/cli-for-jfrog-artifactory/using-file-specs).
+    dry_run : bool
+        Do nothing (passes ``--dry-run`` to JFrog CLI).
+
+    Raises
+    ------
+    CalledProcessError
+        If JFrog command fails.
     """
 
     jfrog_args = []
@@ -55,13 +71,26 @@ def artifactory_copy(json_spec_file: os.PathLike, dry_run: bool = False):
     )
 
 
-def artifactory_folder_replace_copy(json_spec_file: os.PathLike, dry_run: bool = False):
+def artifactory_folder_replace_copy(
+    json_spec_file: os.PathLike,
+    dry_run: bool = False,
+):
     """
-    copy files with `jf rt cp` based on instructions in the specfile, deleting the destination folder first
+    Copy files with ``jf rt cp`` based on instructions in the specfile,
+    deleting the destination folder first.
 
-    :param json_spec_file: JSON file indicating file transfer patterns and targets (see https://docs.jfrog-applications.jfrog.io/jfrog-applications/jfrog-cli/cli-for-jfrog-artifactory/using-file-specs)
-    :param dry_run: do nothing (passes `--dry-run` to JFrog CLI)
-    :raises CalledProcessError: if JFrog command fails
+    Parameters
+    ----------
+    json_spec_file : Path
+        JSON file indicating file transfer patterns and targets
+        (see https://docs.jfrog-applications.jfrog.io/jfrog-applications/jfrog-cli/cli-for-jfrog-artifactory/using-file-specs).
+    dry_run : bool
+        Do nothing (passes ``--dry-run`` to JFrog CLI).
+
+    Raises
+    ------
+    CalledProcessError
+        If JFrog command fails.
     """
 
     jfrog_args = ["--quiet=true"]
@@ -97,12 +126,22 @@ def artifactory_dispatch(
     dry_run: bool = False,
 ):
     """
-    Perform the indicated artifactory operation
+    Perform the indicated artifactory operation.
 
-    :param json_spec_file: JSON file indicating file transfer patterns and targets (see https://docs.jfrog-applications.jfrog.io/jfrog-applications/jfrog-cli/cli-for-jfrog-artifactory/using-file-specs)
-    :param replace_whole_folders: delete entire folders before copying
-    :param dry_run: do nothing (passes `--dry-run` to JFrog CLI)
-    :raises CalledProcessError: if JFrog command fails
+    Parameters
+    ----------
+    json_spec_file : Path
+        JSON file indicating file transfer patterns and targets
+        (see https://docs.jfrog-applications.jfrog.io/jfrog-applications/jfrog-cli/cli-for-jfrog-artifactory/using-file-specs).
+    replace_whole_folders : bool
+        Delete entire folders before copying.
+    dry_run : bool
+        Do nothing (passes ``--dry-run`` to JFrog CLI).
+
+    Raises
+    ------
+    CalledProcessError
+        If JFrog command fails.
     """
 
     if not replace_whole_folders:
@@ -112,24 +151,42 @@ def artifactory_dispatch(
 
 
 def artifactory_download_run_files(
-    runs_directory: os.PathLike | str, run_number: int, suffix: str
+    runs_directory: os.PathLike | str,
+    run_number: int,
+    suffix: str,
 ) -> list[Path]:
     """
     Download files with the given suffix from the given run.
 
-    :param runs_directory: repository path where run directories are stored, i.e. `jwst-pipeline-results/` or `roman-pipeline-results/regression-tests/runs/`
-    :param run_number: GitHub Actions job number of regression test run
-    :param suffix: filename suffix to search for
-    :returns: list of downloaded files on the local file system
-    :raises CalledProcessError: if JFrog command fails
+    Parameters
+    ----------
+    runs_directory : Path or str
+        Repository path where run directories are stored, i.e.,
+        ``jwst-pipeline-results/`` or
+        ``roman-pipeline-results/regression-tests/runs/``.
+    run_number : int
+        GitHub Actions job number of regression test run.
+    suffix : str
+        Filename suffix to search for.
 
+    Returns
+    -------
+    path_list : list
+        Sorted list of downloaded files on the local file system.
+
+    Raises
+    ------
+    CalledProcessError
+        If JFrog command fails.
+
+    Examples
+    --------
     Some example searches would be:
 
     .. code-block:: shell
 
         jfrog rt search jwst-pipeline-results/*_GITHUB_CI_*-586/*_okify.json
         jfrog rt search roman-pipeline-results/*/*_okify.json --props='build.number=540;build.name=RT :: romancal'
-
     """
 
     subprocess.run(
@@ -147,16 +204,32 @@ def artifactory_download_run_files(
 
 
 def artifactory_download_regtest_artifacts(
-    observatory: Observatory, run_number: int
+    observatory: Observatory,
+    run_number: int,
 ) -> tuple[list[Path], list[Path]]:
     """
-    Download both JSON spec files and ASDF breadcrumb files from Artifactory associated with a regression test run
-    (via a job number), and return a list of their downloaded locations on the local file system.
+    Download both JSON spec files and ASDF breadcrumb files from
+    Artifactory associated with a regression test run
+    (via a job number), and return a list of their downloaded
+    locations on the local file system.
 
-    :param observatory: observatory to use
-    :param run_number: GitHub Actions job number of regression test run
-    :returns: two lists of downloaded files on the local file system; JSON specfiles, and ASDF breadcrumb files
-    :raises CalledProcessError: if JFrog command fails
+    Parameters
+    ----------
+    observatory : `Observatory`
+        Observatory to use.
+    run_number : int
+        GitHub Actions job number of regression test run.
+
+    Returns
+    -------
+    specfiles, asdffiles : list
+        Two lists of downloaded files on the local file system;
+        JSON specfiles, and ASDF breadcrumb files.
+
+    Raises
+    ------
+    CalledProcessError
+        If JFrog command fails.
     """
 
     specfiles = artifactory_download_run_files(
@@ -182,9 +255,7 @@ def artifactory_download_regtest_artifacts(
 
 @contextmanager
 def pushd(newdir: os.PathLike):
-    """
-    transient context that emulates `pushd` with `chdir`
-    """
+    """Transient context that emulates ``pushd`` with ``chdir``."""
 
     prevdir = os.getcwd()
     os.chdir(os.path.expanduser(newdir))
@@ -196,39 +267,58 @@ def pushd(newdir: os.PathLike):
 
 def main():
     parser = ArgumentParser(
-        description='"okifies" a set of failing regression test results, by overwriting '
+        description='"Okifies" a set of failing regression test results, by overwriting '
         "truth files on Artifactory so that a set of failing regression test results becomes correct. "
-        "Requires JFrog CLI (https://jfrog.com/getcli/) configured with credentials (`jf login`) "
-        "and write access to the desired truth file repository (`jwst-pipeline`, `roman-pipeline`, etc.)."
+        "Requires JFrog CLI (https://jfrog.com/getcli/) configured with credentials (jf login) "
+        "and write access to the desired truth file repository (jwst-pipeline, roman-pipeline, etc.)."
     )
-    (
-        parser.add_argument(
-            "observatory",
-            type=Observatory,
-            choices=list(Observatory),
-            help="Observatory to overwrite truth files for on Artifactory",
-        ),
+    parser.add_argument(
+        "observatory",
+        type=Observatory,
+        choices=list(Observatory),
+        help="Observatory to overwrite truth files for on Artifactory.",
     )
     parser.add_argument(
         "run_number",
-        help="GitHub Actions job number of regression test run (see https://github.com/spacetelescope/RegressionTests/actions)",
+        help=("GitHub Actions job number of regression test run (see "
+              "https://github.com/spacetelescope/RegressionTests/actions)."),
         metavar="run-number",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"ci-watson {ci_watson.__version__}",
+        help="Print package version and exit.",
     )
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="do nothing (passes the `--dry-run` flag to JFrog CLI)",
+        help="Do nothing (passes the --dry-run flag to JFrog CLI).",
+    )
+    parser.add_argument(
+        "--dlpath",
+        type=str,
+        default="",
+        help=("Store downloaded artifacts in the given path instead of "
+              "temporary directory. The path must already exist."),
     )
 
     args = parser.parse_args()
-
     run = args.run_number
-
     observatory = args.observatory
 
+    if args.dlpath:
+        ctx = nullcontext()
+    else:
+        ctx = tempfile.TemporaryDirectory()
+
     # Create and chdir to a temporary directory to store specfiles
-    with tempfile.TemporaryDirectory() as tmp_path:
+    with ctx as tmp_path:
+        if not tmp_path:
+            tmp_path = args.dlpath
+
         print(f"Downloading test logs to {tmp_path}")
+
         with pushd(tmp_path):
             # Retrieve all the okify specfiles for failed tests.
             json_spec_files, asdf_breadcrumb_files = (
@@ -263,20 +353,16 @@ def main():
 
                 print(
                     f"{Fore.RED}"
-                    + (f" {test_name} ".center(TERMINAL_WIDTH, "—"))
+                    + f" {test_name} ".center(TERMINAL_WIDTH, "—")
                     + f"{Fore.RESET}"
                 )
-                print(traceback)
-                print(f"{Fore.RED}" + ("—" * TERMINAL_WIDTH) + f"{Fore.RESET}")
-                print(f"{Fore.GREEN}OK: {remote_results_path / output.name}")
-                print(f"--> {truth_remote}{Fore.RESET}")
+                print(f"{traceback}\n"
+                      f"{Fore.RED}{'—' * TERMINAL_WIDTH}{Fore.RESET}\n"
+                      f"{Fore.GREEN}OK: {remote_results_path / output.name}\n"
+                      f"--> {truth_remote}{Fore.RESET}")
                 print(
                     f"{Fore.RED}"
-                    + (
-                        f"[ test {index + 1} of {number_failed_tests} ]".center(
-                            TERMINAL_WIDTH, "—"
-                        )
-                    )
+                    + f"[ test {index + 1} of {number_failed_tests} ]".center(TERMINAL_WIDTH, "—")
                     + f"{Fore.RESET}"
                 )
 
