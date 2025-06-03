@@ -545,7 +545,7 @@ def generate_upload_params(results_root, updated_outputs, verbose=True):
     """
     Generate pattern, target, and test name for :func:`generate_upload_schema`.
 
-    This uses ``BUILD_TAG`` and ``BUILD_MATRIX_SUFFIX`` on Jenkins CI to create
+    This uses ``BUILD_TAG`` and ``BUILD_MATRIX_SUFFIX`` on CI to create
     meaningful Artifactory target path. They are optional for local runs.
     Other attributes like user, time stamp, and test name are also
     automatically determined.
@@ -605,11 +605,11 @@ def generate_upload_params(results_root, updated_outputs, verbose=True):
 
 def generate_upload_schema(pattern, target, testname, recursive=False):
     """
-    Write out JSON file to upload Jenkins results from test to
+    Write out JSON file to upload results from test to
     Artifactory storage area.
 
     This function relies on the JFROG JSON schema for uploading data into
-    artifactory using the Jenkins plugin.  Docs can be found at
+    Artifactory.  Docs can be found at
     https://www.jfrog.com/confluence/display/RTF/Using+File+Specs
 
     Parameters

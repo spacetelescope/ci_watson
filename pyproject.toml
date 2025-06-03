@@ -1,6 +1,6 @@
 [project]
 name = "ci_watson"
-description = "CI helper for STScI Jenkins"
+description = "CI helper for STScI regression testing"
 requires-python = ">=3.9"
 authors = [
     { name = "STScI", email = "help@stsci.edu" },
