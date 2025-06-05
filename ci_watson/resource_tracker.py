@@ -1,4 +1,4 @@
-"""Resource tracking regtest utilities
+"""Resource tracking regtest utilities.
 
 Can be used within module-scoped fixtures (often used to
 run Steps or Pipelines) or within tests.
