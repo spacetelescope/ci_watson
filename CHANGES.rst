@@ -1,6 +1,9 @@
 0.10.0 (unreleased)
 ===================
 
+- ``okify_regtests`` no longer emits duplicate prompts in the presence
+  of duplicate ``*_okify.json`` files. [#85]
+
 0.9.0 (2025-06-05)
 ==================
 

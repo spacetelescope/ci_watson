@@ -203,6 +203,14 @@ def artifactory_download_run_files(
     return sorted(Path().rglob(f'*{suffix}'))
 
 
+def _rm_dup_files(file_paths: list[Path]) -> list[Path]:
+    """Remove duplicates if any, prefer last match."""
+    match = {}
+    for s in file_paths:
+        match[s.name] = s
+    return list(match.values())
+
+
 def artifactory_download_regtest_artifacts(
     observatory: Observatory,
     run_number: int,
@@ -241,6 +249,9 @@ def artifactory_download_regtest_artifacts(
 
     if len(specfiles) != len(asdffiles):
         raise RuntimeError("Different number of `_okify.json` and `_rtdata.asdf` files")
+
+    specfiles = _rm_dup_files(specfiles)
+    asdffiles = _rm_dup_files(asdffiles)
 
     for a, b in zip(specfiles, asdffiles):
         if str(a).replace(JSON_SPEC_FILE_SUFFIX, "") != str(b).replace(
