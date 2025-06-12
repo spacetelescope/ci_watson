@@ -364,6 +364,16 @@ def main():
                     except KeyError:
                         test_name = "test_name"
 
+                if okify_op == "folder_copy":
+                    ok_dst = truth_remote
+                    replace_whole_folders = True
+                elif okify_op == "sdp_pool_copy":
+                    ok_dst = os.path.dirname(truth_remote)
+                    replace_whole_folders = True
+                else:
+                    ok_dst = truth_remote
+                    replace_whole_folders = False
+
                 print(
                     f"{Fore.RED}"
                     + f" {test_name} ".center(TERMINAL_WIDTH, "—")
@@ -372,7 +382,7 @@ def main():
                 print(f"{traceback}\n"
                       f"{Fore.RED}{'—' * TERMINAL_WIDTH}{Fore.RESET}\n"
                       f"{Fore.GREEN}OK: {remote_results_path / output.name}\n"
-                      f"--> {truth_remote}{Fore.RESET}")
+                      f"--> {ok_dst}{Fore.RESET}")
                 print(
                     f"{Fore.RED}"
                     + f"[ test {index + 1} of {number_failed_tests} ]".center(TERMINAL_WIDTH, "—")
@@ -406,7 +416,7 @@ def main():
                 else:
                     artifactory_dispatch(
                         json_spec_file,
-                        replace_whole_folders=okify_op == "folder_copy",
+                        replace_whole_folders=replace_whole_folders,
                         dry_run=args.dry_run,
                     )
                     print("")

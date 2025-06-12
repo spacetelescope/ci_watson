@@ -4,6 +4,9 @@
 - ``okify_regtests`` no longer emits duplicate prompts in the presence
   of duplicate ``*_okify.json`` files. [#85]
 
+- ``okify_regtests`` now supports new ``okify_op="sdp_pool_copy"``
+  for JWST regression tests. [#86]
+
 0.9.0 (2025-06-05)
 ==================
 
