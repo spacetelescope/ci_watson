@@ -1,4 +1,4 @@
-0.10.0 (unreleased)
+0.10.0 (2025-06-18)
 ===================
 
 - ``okify_regtests`` no longer emits duplicate prompts in the presence
