@@ -353,10 +353,7 @@ def main():
                     except KeyError:
                         test_name = "test_name"
 
-                if okify_op == "folder_copy":
-                    ok_dst = truth_remote
-                    replace_whole_folders = True
-                elif okify_op == "sdp_pool_copy":
+                if okify_op == "sdp_pool_copy":
                     ok_dst = os.path.dirname(truth_remote)
                     replace_whole_folders = True
                 else:
