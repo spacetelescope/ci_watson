@@ -45,9 +45,9 @@ root directory to use when accessing locations needed for running tests.
 
 Example configuration within ``pyproject.toml``::
 
-    [tool.pytest.ini_options]
-    inputs_root = my_data_repo
-    results_root = my_results_repo
+    [tool.pytest]
+    inputs_root = "my_data_repo"
+    results_root = "my_results_repo"
 
 Example configuration within ``pytest.ini``::
 

@@ -17,7 +17,7 @@ classifiers = [
 dependencies = [
     "crds",
     "colorama>=0.4.1",
-    "pytest>=6",
+    "pytest>=9",
     "readchar>=3.0",
     "requests",
 ]
@@ -75,24 +75,16 @@ namespaces = false
 [tool.setuptools_scm]
 version_file = "ci_watson/version.py"
 
-[tool.pytest.ini_options]
-minversion = "6"
-testpaths = [
-    "tests",
-]
-norecursedirs = [
-    ".eggs",
-    "build",
-]
+[tool.pytest]
+minversion = "9"
+testpaths = ["tests"]
+norecursedirs = [".eggs", "build"]
 astropy_header = true
 xfail_strict = true
 inputs_root = "ci-watson"
 junit_family = "xunit2"
-filterwarnings = [
-    "error",
-    "ignore:numpy.ndarray size changed:RuntimeWarning",
-]
-addopts = "-p no:legacypath"
+filterwarnings = ["error", "ignore:numpy.ndarray size changed:RuntimeWarning"]
+addopts = ["-p no:legacypath"]
 
 [tool.ruff.lint]
 select = [
