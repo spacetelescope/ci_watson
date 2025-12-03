@@ -108,3 +108,4 @@ venv.bak/
 
 # Misc
 *~
+uv.lock
