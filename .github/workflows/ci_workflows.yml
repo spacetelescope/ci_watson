@@ -24,7 +24,6 @@ jobs:
         - linux: check-build
 
         # Basic tests (Windows not supported)
-        - linux: py39-test
         - macos: py310-test
         - linux: py311-test
 
