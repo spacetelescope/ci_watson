@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 from argparse import ArgumentParser
 from contextlib import contextmanager, nullcontext
@@ -253,6 +254,41 @@ def artifactory_download_regtest_artifacts(
     return specfiles, asdffiles
 
 
+def warn_on_rerun(
+    observatory: Observatory,
+    run_number: int,
+):
+    """
+    Check for a RERUN file and prompt user to confirm that
+    they want to okify a rerun (which is often problematic).
+
+    Parameters
+    ----------
+    observatory : `Observatory`
+        Observatory to use.
+    run_number : int
+        GitHub Actions job number of regression test run.
+    """
+    rerun_files = artifactory_download_run_files(
+        observatory.runs_directory, run_number, "RERUN"
+    )
+
+    if not len(rerun_files):
+        return
+
+    print("!" * 80)
+    print("This run appears to be a 'rerun' and may contain files for multiple test runs")
+    print("Okifying this 'rerun' may result in incorrect file replacement and should")
+    print("generally be avoided.")
+    print("!" * 80)
+    print("\nDo you want to continue and okify this rerun?")
+    user_input = input("yes/[no]\n").strip().lower()
+    if not user_input or user_input[0] != "y":
+        print("exiting without okifying")
+        sys.exit(0)
+    print("proceeding with okifying")
+
+
 @contextmanager
 def pushd(newdir: os.PathLike | str):
     """Transient context that emulates ``pushd`` with ``chdir``."""
@@ -322,6 +358,9 @@ def main():
         print(f"Downloading test logs to {tmp_path}")
 
         with pushd(tmp_path):
+            # Check and warn if this is a rerun
+            warn_on_rerun(observatory, run)
+
             # Retrieve all the okify specfiles for failed tests.
             json_spec_files, asdf_breadcrumb_files = (
                 artifactory_download_regtest_artifacts(observatory, run)
