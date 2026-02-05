@@ -259,7 +259,7 @@ def warn_on_rerun(
     run_number: int,
 ):
     """
-    Check for a RERUN file and prompt user to confirm that
+    Check for a IS_RERUN file and prompt user to confirm that
     they want to okify a rerun (which is often problematic).
 
     Parameters
@@ -270,7 +270,7 @@ def warn_on_rerun(
         GitHub Actions job number of regression test run.
     """
     rerun_files = artifactory_download_run_files(
-        observatory.runs_directory, run_number, "RERUN"
+        observatory.runs_directory, run_number, "IS_RERUN"
     )
 
     if not len(rerun_files):
