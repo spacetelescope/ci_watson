@@ -3,6 +3,7 @@
 
 - ``okify_regtests`` no longer supports ``okify_op="folder_copy"``
   for JWST regression tests because it is no longer used downstream. [#92]
+- Prompt the user to confirm they want to okify a rerun [#96]
 
 0.10.0 (2025-06-18)
 ===================
