@@ -83,7 +83,10 @@ astropy_header = true
 xfail_strict = true
 inputs_root = ["ci-watson"]
 junit_family = "xunit2"
-filterwarnings = ["error", "ignore:numpy.ndarray size changed:RuntimeWarning"]
+filterwarnings = [
+  "error",
+  "ignore:numpy.ndarray size changed:RuntimeWarning",
+]
 addopts = ["-p no:legacypath"]
 
 [tool.ruff.lint]
