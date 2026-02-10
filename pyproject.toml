@@ -86,6 +86,7 @@ junit_family = "xunit2"
 filterwarnings = [
   "error",
   "ignore:numpy.ndarray size changed:RuntimeWarning",
+  "ignore:The chararray class is deprecated:DeprecationWarning",
 ]
 addopts = ["-p no:legacypath"]
 
