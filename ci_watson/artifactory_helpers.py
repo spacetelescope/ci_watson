@@ -15,15 +15,9 @@ from io import StringIO
 try:
     from astropy.io import fits
     from astropy.io.fits import FITSDiff, HDUDiff
-    from astropy.utils.introspection import minversion
     HAS_ASTROPY = True
 except ImportError:
     HAS_ASTROPY = False
-
-if HAS_ASTROPY and minversion('astropy', '3.1'):
-    ASTROPY_LT_3_1 = False
-else:
-    ASTROPY_LT_3_1 = True
 
 __all__ = ['BigdataError', 'check_url', 'get_bigdata_root', 'get_bigdata',
            'compare_outputs', 'generate_upload_params',
@@ -380,17 +374,10 @@ def compare_outputs(outputs, raise_error=True, ignore_keywords=[],
               separately.
 
     """
-    if ASTROPY_LT_3_1:
-        if len(ignore_hdus) > 0:  # pragma: no cover
-            raise ValueError('ignore_hdus cannot be used for astropy<3.1')
-        default_kwargs = {'rtol': rtol, 'atol': atol,
-                          'ignore_keywords': ignore_keywords,
-                          'ignore_fields': ignore_fields}
-    else:
-        default_kwargs = {'rtol': rtol, 'atol': atol,
-                          'ignore_keywords': ignore_keywords,
-                          'ignore_fields': ignore_fields,
-                          'ignore_hdus': ignore_hdus}
+    default_kwargs = {'rtol': rtol, 'atol': atol,
+                      'ignore_keywords': ignore_keywords,
+                      'ignore_fields': ignore_fields,
+                      'ignore_hdus': ignore_hdus}
 
     all_okay = True
     creature_report = ''
@@ -545,7 +532,7 @@ def generate_upload_params(results_root, updated_outputs, verbose=True):
     """
     Generate pattern, target, and test name for :func:`generate_upload_schema`.
 
-    This uses ``BUILD_TAG`` and ``BUILD_MATRIX_SUFFIX`` on Jenkins CI to create
+    This uses ``BUILD_TAG`` and ``BUILD_MATRIX_SUFFIX`` on CI to create
     meaningful Artifactory target path. They are optional for local runs.
     Other attributes like user, time stamp, and test name are also
     automatically determined.
@@ -605,11 +592,11 @@ def generate_upload_params(results_root, updated_outputs, verbose=True):
 
 def generate_upload_schema(pattern, target, testname, recursive=False):
     """
-    Write out JSON file to upload Jenkins results from test to
+    Write out JSON file to upload results from test to
     Artifactory storage area.
 
     This function relies on the JFROG JSON schema for uploading data into
-    artifactory using the Jenkins plugin.  Docs can be found at
+    Artifactory.  Docs can be found at
     https://www.jfrog.com/confluence/display/RTF/Using+File+Specs
 
     Parameters

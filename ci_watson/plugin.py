@@ -132,4 +132,3 @@ def log_tracked_resources(resource_tracker, request):
         resource_tracker.log(request)
 
     yield callback
-
