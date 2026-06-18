@@ -23,21 +23,16 @@ TERMINAL_WIDTH = shutil.get_terminal_size((80, 20)).columns
 
 
 class Observatory(Enum):
-    jwst = "jwst"
-    roman = "roman"
+    jwst = "jwst-pipeline-results"
+    roman = "roman-pipeline-results"
 
     def __str__(self):
-        return self.value
+        return self.name.lower()
 
     @property
     def runs_directory(self) -> str:
         """Directory on Artifactory where run results are stored."""
-        if self == Observatory.jwst:
-            return "jwst-pipeline-results/"
-        elif self == Observatory.roman:
-            return "roman-pipeline-results/regression-tests/runs/"
-        else:
-            raise NotImplementedError(f"runs directory not defined for '{self}'")
+        return f"{self.value}/regression-tests/runs"
 
 
 def artifactory_copy(
@@ -163,7 +158,7 @@ def artifactory_download_run_files(
     ----------
     runs_directory : Path or str
         Repository path where run directories are stored, i.e.,
-        ``jwst-pipeline-results/`` or
+        ``jwst-pipeline-results/regression-tests/runs/`` or
         ``roman-pipeline-results/regression-tests/runs/``.
     run_number : int
         GitHub Actions job number of regression test run.
