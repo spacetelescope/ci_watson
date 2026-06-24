@@ -27,7 +27,7 @@ class Observatory(Enum):
     roman = "roman-pipeline-results"
 
     def __str__(self):
-        return self.name.lower()
+        return self.name
 
     @property
     def runs_directory(self) -> str:
