@@ -23,16 +23,8 @@ TERMINAL_WIDTH = shutil.get_terminal_size((80, 20)).columns
 
 
 class Observatory(Enum):
-    jwst = "jwst-pipeline-results"
-    roman = "roman-pipeline-results"
-
-    def __str__(self):
-        return self.name
-
-    @property
-    def runs_directory(self) -> str:
-        """Directory on Artifactory where run results are stored."""
-        return f"{self.value}/regression-tests/runs"
+    jwst = "jwst-pipeline-results/regression-tests/runs"
+    roman = "roman-pipeline-results/regression-tests/runs"
 
 
 def artifactory_copy(
@@ -229,10 +221,10 @@ def artifactory_download_regtest_artifacts(
     """
 
     specfiles = artifactory_download_run_files(
-        observatory.runs_directory, run_number, JSON_SPEC_FILE_SUFFIX
+        observatory.value, run_number, JSON_SPEC_FILE_SUFFIX
     )
     asdffiles = artifactory_download_run_files(
-        observatory.runs_directory, run_number, ASDF_BREADCRUMB_FILE_SUFFIX
+        observatory.value, run_number, ASDF_BREADCRUMB_FILE_SUFFIX
     )
 
     if len(specfiles) != len(asdffiles):
@@ -265,7 +257,7 @@ def warn_on_rerun(
         GitHub Actions job number of regression test run.
     """
     rerun_files = artifactory_download_run_files(
-        observatory.runs_directory, run_number, "IS_RERUN"
+        observatory.value, run_number, "IS_RERUN"
     )
 
     if not len(rerun_files):
