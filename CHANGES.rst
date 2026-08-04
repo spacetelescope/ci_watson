@@ -1,4 +1,4 @@
-0.12.0 (Unreleased)
+0.12.0 (2026-08-04)
 ===================
 
 - Switch ``slow`` marker to use upstream ``pytest-skip-slow`` plugin instead of
