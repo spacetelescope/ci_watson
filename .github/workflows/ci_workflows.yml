@@ -6,6 +6,10 @@ on:
     - main
     tags:
     - '*'
+  schedule:
+    # Weekly run on Mondays at 9am UTC
+    # * is a special character in YAML so you have to quote this string
+    - cron: "0 9 * * 1"
   pull_request:
 
 concurrency:
