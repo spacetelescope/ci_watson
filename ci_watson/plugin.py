@@ -15,13 +15,6 @@ def pytest_addoption(parser):
     These pytest hooks allow us to mark tests and run the marked tests with
     specific command line options.
     """
-    # Add option to run slow tests
-    parser.addoption(
-        "--slow",
-        action="store_true",
-        help="run slow tests"
-    )
-
     # Add option to use big data sets
     parser.addoption(
         "--bigdata",
@@ -54,16 +47,10 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     config.getini('markers').append(
-        'slow: Run tests that are resource intensive')
-
-    config.getini('markers').append(
         'bigdata: Run tests that require intranet access')
 
 
 def pytest_runtest_setup(item):
-    if 'slow' in item.keywords and not item.config.getvalue("slow"):
-        pytest.skip("need --slow option to run")
-
     if 'bigdata' in item.keywords and not item.config.getvalue("bigdata"):
         pytest.skip("need --bigdata option to run")
 

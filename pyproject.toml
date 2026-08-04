@@ -18,6 +18,8 @@ dependencies = [
     "crds",
     "colorama>=0.4.1",
     "pytest>=9",
+    # Use upstream pytest-skip-slow to implement the slow marker
+    "pytest-skip-slow>=1.1.0",
     "readchar>=3.0",
     "requests",
 ]
