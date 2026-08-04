@@ -33,3 +33,4 @@ jobs:
         # Test with dev versions of upstream dependencies
         - linux: py312-slow-devdeps
           posargs: --verbose
+        - linux: py312-slow-astropy
