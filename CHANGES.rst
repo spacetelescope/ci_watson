@@ -1,3 +1,9 @@
+0.12.0 (Unreleased)
+===================
+
+- Switch ``slow`` marker to use upstream ``pytest-skip-slow`` plugin instead of
+  the one defined in ``ci-watson``. [#105]
+
 0.11.0 (2026-02-06)
 ===================
 
