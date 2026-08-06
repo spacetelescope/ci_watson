@@ -23,6 +23,7 @@ TERMINAL_WIDTH = shutil.get_terminal_size((80, 20)).columns
 
 
 class Observatory(Enum):
+    hst = "hst"
     jwst = "jwst"
     roman = "roman"
 
@@ -32,7 +33,9 @@ class Observatory(Enum):
     @property
     def runs_directory(self) -> str:
         """Directory on Artifactory where run results are stored."""
-        if self == Observatory.jwst:
+        if self == Observatory.hst:
+            return "scsb-hstcal-results/"
+        elif self == Observatory.jwst:
             return "jwst-pipeline-results/"
         elif self == Observatory.roman:
             return "roman-pipeline-results/regression-tests/runs/"
