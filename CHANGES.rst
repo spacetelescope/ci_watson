@@ -1,3 +1,9 @@
+0.13.0 (2026-08-27)
+===================
+
+- standardize regression test results output to ``regression-tests/runs/`` [#101]
+  This affects the location that ``okify_regtests`` looks for results directories on Artifactory.
+
 0.12.0 (2026-08-04)
 ===================
 
