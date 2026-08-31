@@ -26,6 +26,16 @@ class Observatory(Enum):
     jwst = "jwst-pipeline-results/regression-tests/runs"
     roman = "roman-pipeline-results/regression-tests/runs"
 
+    def __str__(self) -> str:
+        return self.name
+
+    @staticmethod
+    def from_string(observatory):
+        try:
+            return Observatory[observatory]
+        except KeyError:
+            raise NotImplementedError(f"no such observatory `{observatory}`")
+
 
 def artifactory_copy(
     json_spec_file: os.PathLike,
@@ -297,8 +307,7 @@ def main():
     )
     parser.add_argument(
         "observatory",
-        type=Observatory,
-        choices=list(Observatory),
+        type=Observatory.from_string,
         help="Observatory to overwrite truth files for on Artifactory.",
     )
     parser.add_argument(
