@@ -1,3 +1,9 @@
+0.13.1 (2016-08-13)
+===================
+
+- fixes an issue brought up by @melanieclarke where running ``okify_regtests jwst`` would fail 
+  because ``argparse`` apparently looks for the enum _value_ instead of the name when matching [#110]
+
 0.13.0 (2026-08-27)
 ===================
 
