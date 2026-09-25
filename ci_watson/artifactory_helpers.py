@@ -98,21 +98,9 @@ def retry(retries=RETRY_MAX, delay=RETRY_DELAY, trap=(Exception,)):
     return decorator
 
 
-@retry()
-def check_url(url, timeout=TIMEOUT):
-    """Determine if URL can be resolved without error."""
-    if RE_URL.match(url) is None:
-        return False
-
-    # Optional import: requests is not needed for local big data setup.
-    import requests
-
-    # requests.head does not work with Artifactory landing page.
-    r = requests.get(url, allow_redirects=True, timeout=timeout)
-    # TODO: Can we simply return r.ok here?
-    if r.status_code >= 400:
-        return False
-    return True
+def check_url(url):
+    """Determine if url is a URL."""
+    return RE_URL.match(url) is not None
 
 
 @retry()
@@ -124,6 +112,7 @@ def _download(url, dest, timeout=TIMEOUT, chunk_size=CHUNK_SIZE):
     dest = os.path.abspath(dest)
 
     with requests.get(url, stream=True, timeout=timeout) as r:
+        r.raise_for_status()
         with open(dest, 'w+b') as data:
             for chunk in r.iter_content(chunk_size=chunk_size):
                 data.write(chunk)
