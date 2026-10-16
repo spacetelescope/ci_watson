@@ -37,7 +37,7 @@ UPLOAD_SCHEMA = {"files": [
 
 TODAYS_DATE = datetime.now().strftime("%Y-%m-%d")
 TIMEOUT = int(os.environ.get("TEST_BIGDATA_TIMEOUT", 30))
-CHUNK_SIZE = int(os.environ.get("TEST_BIGDATA_CHUNK_SIZE", 16384))
+CHUNK_SIZE = int(os.environ.get("TEST_BIGDATA_CHUNK_SIZE", 1048576))
 RETRY_MAX = int(os.environ.get("TEST_BIGDATA_RETRY_MAX", 3))
 RETRY_DELAY = int(os.environ.get("TEST_BIGDATA_RETRY_DELAY", 5))
 
