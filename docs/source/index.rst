@@ -1,3 +1,7 @@
+.. image:: https://github.com/spacetelescope/branding/blob/81b7021231e885bda9c022e6c082b3cf26009b3b/stsci_pri_combo_mark_horizonal_white_bkgd.svg?raw=true
+   :width: 83%
+   :target: https://stsci.edu
+
 .. ci_watson documentation master file, created by
    sphinx-quickstart on Tue Aug  7 16:43:10 2018.
    You can adapt this file completely to your liking, but it should at least
