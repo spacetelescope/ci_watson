@@ -99,6 +99,10 @@ html_theme_options = {
     ],
     # https://github.com/pydata/pydata-sphinx-theme/issues/1492
     "navigation_with_keys": False,
+   "logo": {
+      "image_light": "https://github.com/spacetelescope/branding/blob/81b7021231e885bda9c022e6c082b3cf26009b3b/stsci_sec_combo_mark_horizonal_light_bkgd.svg?raw=true",
+      "image_dark": "https://github.com/spacetelescope/branding/blob/81b7021231e885bda9c022e6c082b3cf26009b3b/stsci_sec_combo_mark_horizonal_dark_bkgd.svg?raw=true",
+   }
 }
 
 html_context = {
@@ -123,7 +127,6 @@ html_copy_source = False
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 html_css_files = ["ci_watson.css"]
-html_logo = "_static/stsci_logo.png"
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'python': ('https://docs.python.org/', None)}
