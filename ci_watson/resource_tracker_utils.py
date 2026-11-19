@@ -87,7 +87,7 @@ def parse_single_junit_result_xml(source):
             key = (classname, testname)
 
             for prop in tracked_mem_elements:
-                # Save the peak memory and run time.
+                # Save the peak memory (bytes) and run time (seconds).
                 for attrname in ("peakmem", "time"):
                     if prop.attrib["name"] == f"tracked-{attrname}":
                         peakmem_dict[key][attrname] = prop.get("value")
