@@ -175,7 +175,7 @@ def read_benchmarks_per_tst(csvfile):
 
     # Make metadata more easily accessible.
     comments = tbl.meta["comments"]
-    d = dict(c.split(":") for c in comments)
+    d = dict(map(str.strip, c.split(":")) for c in comments)
     del tbl.meta["comments"]
     tbl.meta.update(d)
 
