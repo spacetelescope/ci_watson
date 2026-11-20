@@ -1,9 +1,13 @@
 """Functions for interpreting resource_tracker outputs."""
 
 from collections import defaultdict
+from pathlib import Path
 from xml.etree import ElementTree as ET
 
-__all__ = ["parse_single_junit_result_xml"]
+__all__ = [
+    "parse_single_junit_result_xml",
+    "write_benchmarks_per_tst",
+]
 
 
 def parse_single_junit_result_xml(source):
@@ -80,10 +84,10 @@ def parse_single_junit_result_xml(source):
         if tracked_mem_elements:
             # Some tests have the same name but are in different modules,
             # so we need tuple as unique key.
-            # Also make sure the test name does not contain / because this
-            # causes problems with pathlib later.
-            classname = element.attrib["classname"]
-            testname = element.attrib["name"].replace("/", "--")
+            # Also make sure the names are friendly for filename
+            # serialization later.
+            classname = element.attrib["classname"].replace(".", "__")
+            testname = element.attrib["name"].replace("/", "__")
             key = (classname, testname)
 
             for prop in tracked_mem_elements:
@@ -93,3 +97,52 @@ def parse_single_junit_result_xml(source):
                         peakmem_dict[key][attrname] = prop.get("value")
 
     return test_date, failures, peakmem_dict
+
+
+def _key_to_filename(key):
+    """Serialize key from peakmem_dict into filename."""
+    classname, testname = key
+    return f"{classname}_M_{testname}.csv"
+
+
+# The _tst instead of _test so pytest will not collect this.
+def write_benchmarks_per_tst(source, outdir="."):
+    """
+    Rewrite junit output for per-test benchmark ingestion.
+
+    Parameters
+    ----------
+    source : str or fileobj
+        Filename or file object containing XML data
+        to be parsed by :func:`parse_single_junit_result_xml`.
+
+    outdir : str
+        Output directory where one file per test will be
+        written to. These files are meant to be updated
+        over time. If a file exists, it will be appended to;
+        otherwise, a new file will be created. Old contents
+        are not re-validated nor checked for duplicates.
+
+    Returns
+    -------
+    file_list : list of str
+        List of written files for auditing.
+    """
+    test_date, failures, peakmem_dict = parse_single_junit_result_xml(source)
+    outpath = Path(outdir)
+    file_list = []
+
+    for key, val in peakmem_dict.items():
+        fname = outpath / _key_to_filename(key)
+        file_list.append(str(fname))
+        if not fname.exists():
+            with open(fname, "w") as fout:
+                fout.write(f"# classname: {key[0]}\n")
+                fout.write(f"# testname: {key[1]}\n")
+                fout.write("test_date,failures,peakmem,time\n")
+                fout.write(f"{test_date},{failures},{val[peakmem]}{val[time]}\n")
+        else:
+            with open(fname, "a") as fout:
+                fout.write(f"{test_date},{failures},{val[peakmem]}{val[time]}\n")
+
+    return file_list
