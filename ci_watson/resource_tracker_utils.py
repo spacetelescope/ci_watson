@@ -75,29 +75,32 @@ def parse_single_junit_result_xml(source):
     # </testcase>
     #
     for element in root.iter("testcase"):
+        tracked_mem_elements = element.findall("properties/property")
+
+        # If this list does not exist, no memory peak was recorded.
+        if not tracked_mem_elements:
+            continue
+
+        # Some tests have the same name but are in different modules,
+        # so we need tuple as unique key.
+        # Also make sure the names are friendly for filename
+        # serialization later.
+        classname = element.attrib["classname"].replace(".", "__")
+        testname = element.attrib["name"].replace("/", "__")
+        key = (classname, testname)
+
+        # Save the peak memory (bytes) and run time (seconds).
+        for prop in tracked_mem_elements:
+            for attrname in ("peakmem", "time"):
+                if prop.attrib["name"] == f"tracked-{attrname}":
+                    peakmem_dict[key][attrname] = prop.get("value")
+
+        # Save the test status.
         failure = element.findall("failure")
         if failure:
             peakmem_dict[key]["passed"] = False
         else:
             peakmem_dict[key]["passed"] = True
-
-        tracked_mem_elements = element.findall("properties/property")
-
-        # If this list does not exist, no memory peak was recorded.
-        if tracked_mem_elements:
-            # Some tests have the same name but are in different modules,
-            # so we need tuple as unique key.
-            # Also make sure the names are friendly for filename
-            # serialization later.
-            classname = element.attrib["classname"].replace(".", "__")
-            testname = element.attrib["name"].replace("/", "__")
-            key = (classname, testname)
-
-            # Save the peak memory (bytes) and run time (seconds).
-            for prop in tracked_mem_elements:
-                for attrname in ("peakmem", "time"):
-                    if prop.attrib["name"] == f"tracked-{attrname}":
-                        peakmem_dict[key][attrname] = prop.get("value")
 
     return test_date, peakmem_dict
 
