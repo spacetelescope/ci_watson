@@ -31,7 +31,7 @@ def parse_single_junit_result_xml(source):
 
             {
                 (classname, name): {
-                    "passed": True,
+                    "passed": 1,
                     "peakmem": 0.1,
                     "time": 10
                 }
@@ -98,9 +98,9 @@ def parse_single_junit_result_xml(source):
         # Save the test status.
         failure = element.findall("failure")
         if failure:
-            peakmem_dict[key]["passed"] = False
+            peakmem_dict[key]["passed"] = 0
         else:
-            peakmem_dict[key]["passed"] = True
+            peakmem_dict[key]["passed"] = 1
 
     return test_date, peakmem_dict
 
@@ -172,11 +172,18 @@ def read_benchmarks_per_tst(csvfile):
         Class and test names are in table metadata.
     """
     try:
-        from astropy.table import Table
+        from astropy import units as u
+        from astropy.table import QTable
     except ImportError:
         raise ImportError("Install astropy to use this function") from None
 
-    tbl = Table.read(csvfile, format="ascii.csv", comment="#", guess=False)
+    tbl = QTable.read(
+        csvfile,
+        format="ascii.csv",
+        comment="#",
+        guess=False,
+        units={"peakmem": u.byte, "time": u.s},
+    )
 
     # Make metadata more easily accessible.
     comments = tbl.meta["comments"]
