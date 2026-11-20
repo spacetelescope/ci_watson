@@ -140,9 +140,9 @@ def write_benchmarks_per_tst(source, outdir="."):
                 fout.write(f"# classname: {key[0]}\n")
                 fout.write(f"# testname: {key[1]}\n")
                 fout.write("test_date,failures,peakmem,time\n")
-                fout.write(f"{test_date},{failures},{val['peakmem']}{val['time']}\n")
+                fout.write(f"{test_date},{failures},{val['peakmem']},{val['time']}\n")
         else:
             with open(fname, "a") as fout:
-                fout.write(f"{test_date},{failures},{val['peakmem']}{val['time']}\n")
+                fout.write(f"{test_date},{failures},{val['peakmem']},{val['time']}\n")
 
     return file_list
