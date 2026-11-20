@@ -102,7 +102,7 @@ def parse_single_junit_result_xml(source):
 def _key_to_filename(key):
     """Serialize key from peakmem_dict into filename."""
     classname, testname = key
-    return f"{classname}_M_{testname}.csv"
+    return f"{classname}__{testname}.csv"
 
 
 # The _tst instead of _test so pytest will not collect this.
