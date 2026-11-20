@@ -25,15 +25,13 @@ def parse_single_junit_result_xml(source):
     test_date : str
         Date the test was run.
 
-    failures : int
-        Number of test failures in the run.
-
     peakmem_dict : dict
         Dictionary mapping a test to another dictionary
         containing its benchmark statistics, e.g.::
 
             {
                 (classname, name): {
+                    "passed": True,
                     "peakmem": 0.1,
                     "time": 10
                 }
@@ -59,9 +57,6 @@ def parse_single_junit_result_xml(source):
         items = element.findall("testsuite")[0]
         if items is not None:
             test_date = items.attrib["timestamp"]
-            # Also get the failures variable.
-            failures = int(items.attrib["failures"])
-
             break
         else:
             raise ValueError("XML format change!")
@@ -72,6 +67,7 @@ def parse_single_junit_result_xml(source):
     # All test cases will be under the testsuite element, as follows:
     #
     # <testcase classname="pkg.module" name="test_name" time="16.539">
+    #   <failure message="...">...</failure>
     #   <properties>
     #     <property name="tracked-peakmem" value="802075618"/>
     #     <property name="tracked-time" value="16.49477450037375"/>
@@ -79,6 +75,12 @@ def parse_single_junit_result_xml(source):
     # </testcase>
     #
     for element in root.iter("testcase"):
+        failure = element.findall("failure")
+        if failure:
+            peakmem_dict[key]["passed"] = False
+        else:
+            peakmem_dict[key]["passed"] = True
+
         tracked_mem_elements = element.findall("properties/property")
 
         # If this list does not exist, no memory peak was recorded.
@@ -91,13 +93,13 @@ def parse_single_junit_result_xml(source):
             testname = element.attrib["name"].replace("/", "__")
             key = (classname, testname)
 
+            # Save the peak memory (bytes) and run time (seconds).
             for prop in tracked_mem_elements:
-                # Save the peak memory (bytes) and run time (seconds).
                 for attrname in ("peakmem", "time"):
                     if prop.attrib["name"] == f"tracked-{attrname}":
                         peakmem_dict[key][attrname] = prop.get("value")
 
-    return test_date, failures, peakmem_dict
+    return test_date, peakmem_dict
 
 
 def _key_to_filename(key):
@@ -129,7 +131,7 @@ def write_benchmarks_per_tst(source, outdir="."):
     file_list : list of str
         List of written files for auditing.
     """
-    test_date, failures, peakmem_dict = parse_single_junit_result_xml(source)
+    test_date, peakmem_dict = parse_single_junit_result_xml(source)
     outpath = Path(outdir)
     file_list = []
 
@@ -140,11 +142,11 @@ def write_benchmarks_per_tst(source, outdir="."):
             with open(fname, "w") as fout:
                 fout.write(f"# classname: {key[0]}\n")
                 fout.write(f"# testname: {key[1]}\n")
-                fout.write("test_date,failures,peakmem,time\n")
-                fout.write(f"{test_date},{failures},{val['peakmem']},{val['time']}\n")
+                fout.write("test_date,passed,peakmem,time\n")
+                fout.write(f"{test_date},{val['passed']},{val['peakmem']},{val['time']}\n")
         else:
             with open(fname, "a") as fout:
-                fout.write(f"{test_date},{failures},{val['peakmem']},{val['time']}\n")
+                fout.write(f"{test_date},{val['passed']},{val['peakmem']},{val['time']}\n")
 
     return file_list
 
